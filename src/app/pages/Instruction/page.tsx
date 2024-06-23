@@ -18,7 +18,7 @@ const Instruction = () => {
     ];
 
     return (
-        <div className='bg-[#EAEEFF] min-h-screen'>
+        <div className='bg-[#EAEEFF] min-h-screen min-w-screen'>
             <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
                 <div className='flex justify-center items-center'>
                     <img src="/icons/csi_logo.svg" alt="" className='px-3 w-[50px]' />
@@ -27,7 +27,7 @@ const Instruction = () => {
             </div>
 
             <div className='flex flex-col items-center'>
-                <div className='w-[90%] z-10 flex flex-col justify-between items-center'>
+                <div className='w-[90%] h-[100%] flex flex-col justify-between items-center'>
                     <div className='p-5 mt-6 relative bg-cover bg-center' style={{ backgroundImage: "url('/icons/bg.png')" }}>
                         <h1 className='font-bold mb-4 text-xl'>INSTRUCTIONS</h1>
                         <div className='flex'>
@@ -59,11 +59,12 @@ const Instruction = () => {
                         </div>
                      </div>
 
-                    <div className='w-full flex justify-evenly items-center h-[8%] rounded-lg mt-4'>
-                        <div className='w-[30%] h-full flex flex-col justify-evenly items-center shadow-[0px_0px_20px_0px_#00000040] rounded-lg'>
-                            <span className='my-4'>Select Language</span>
+<div className='flex justify-start'>
+                    <div className='w-[40%] mt-7 pb-4'>
+                        <div className='w-[96%] h-[100%] flex flex-col pl-8 rounded-lg' style={{ backgroundImage: "url('/icons/SelectLanguagebg.png')" }}>
+                            <span className='my-6 font-bold text-lg'>Select Language</span>
                             <select
-                                className='p-3 px-8 w-[60%] rounded-xl shadow-[0px_0px_20px_0px_#00000040] appearance-none cursor-pointer focus:outline-none font-bold'
+                                className='p-3 mb-12 px-8 w-[80%] rounded-xl bg-[#EAEEFF] appearance-none cursor-pointer focus:outline-none font-medium'
                                 onClick={() => setOpen(!open)}
                             >
                                 <option value="">C++</option>
@@ -71,31 +72,34 @@ const Instruction = () => {
                                 <option value="py">Python</option>
                                 <option value="java">Java</option>
                             </select>
-                            <div className={`font-bold absolute transition-all duration-300 right-5 top-1/2 transform ${open ? 'rotate-180' : 'rotate-0'}`}>▼</div>
+                            <div className={` absolute transition-all duration-300 left-[22%]  mt-24 transform ${open ? 'rotate-180' : 'rotate-0'}`}><img src='/icons/DropDown.png'></img></div>
                         </div>
+                        </div>
+                        
+                        <div className='w-[100%] h-full flex flex-col rounded-lg mt-7 ml-3' style={{ backgroundImage: "url('/icons/Startbg.png')" }}>
+                            <div className='flex text-base mb-5 mt-5 pl-3 pr-4 font-bold'>
+                                <input type='checkbox' className='rounded w-5 h-5 mt-0.5' />
+                                <span className='pl-2'>
+                                    I hereby confirm that I have read all the instructions and am ready to begin my test. Write START in the Text Box to enable Start Button
+                                </span>
+                            </div>
 
-                        <div className='w-[30%] h-full flex flex-col justify-evenly items-center shadow-[0px_0px_20px_0px_#00000040] rounded-lg'>
-                            <span className='text-sm text-center mb-2 text-gray-500'>
-                                <input type='checkbox' className='h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded' />
-                                <label className='text-gray-700'>
-                                    I agree to the terms and conditions. I hereby confirm that I have read all the instructions and am ready to begin my test. Write START in the Text Box to enable Start Button
-                                </label>
-                            </span>
-                            <div className='flex flex-row'>
+                            <div className='flex justify-end mb-8 pr-4'>
                                 <input
-                                    className='shadow-[0px_0px_20px_0px_#00000040] focus:outline-none rounded-md p-3'
+                                    className='w-[20%] border border-black focus:outline-none rounded-lg p-3 text-center bg-transparent placeholder-gray-500'
                                     type="text"
                                     value={start}
                                     onChange={handleChange}
+                                    placeholder="START"
                                 />
                                 <button
                                     disabled={start !== "START"}
-                                    className={`${start !== "START" ? 'bg-gray-300 text-gray-600' : 'bg-blue-300 text-black'} w-[100%] rounded-xl p-2 pl-6 pr-6`}
+                                    className={`${start !== "START" ? 'bg-gray-300 text-gray-600' : 'bg-[#546CFF] text-white'} w-[20%] rounded-xl p-2 pl-5 pr-5 ml-4 text-lg`}
                                 >
-                                    START
+                                    Start
                                 </button>
                             </div>
-                        </div>
+                         </div>
                     </div>
                 </div>
             </div>
