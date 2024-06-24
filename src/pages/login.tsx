@@ -17,6 +17,7 @@ export default function Login(): React.ReactElement {
 }
 
 const LoginComponent = () => {
+  const [passwardVisible , setpasswordVisible] = useState(false);
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [disabled, setDisabled] = useState(false);
 
@@ -35,6 +36,7 @@ const LoginComponent = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
+      console.log(values);
       setDisabled(true);
       try {
         if (!executeRecaptcha) {
@@ -59,7 +61,9 @@ const LoginComponent = () => {
       }
     },
   });
-
+  const togglepassword = () => {
+    setpasswordVisible(!passwardVisible);
+  }
   return (
     <div className='relative min-h-[100vh] w-full'
       style={{
@@ -81,20 +85,23 @@ const LoginComponent = () => {
           width:'25vw'
         }}>
           <div>
-            <p className='font-semibold text-3xl'>Cine-2024</p>
+            <p className='font-semibold text-4xl'>Cine-2024</p>
           </div>
-          <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5">
+          <form onSubmit={handleSubmit} className="w-full flex flex-col gap-5 items-center">
             <div className='flex flex-col'>
-              <label htmlFor="studentNumber">Student Number:</label>
-              <div className='border-4'>
+              <label htmlFor="studentNumber" className='font-semibold mb-2'>Student Number:</label>
+              <div className='border-2 border-black py-3 px-2 rounded-lg flex gap-4 w-[20rem]'>
+                <div className='ml-2'><img src='./student-icon.svg'/></div>
                 <input
                   id="studentNumber"
                   type="text"
                   name="studentNumber"
-                  placeholder="Enter Your Student Number"
+                  placeholder="Enter Your Student No"
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values.studentNumber}
+                  style={{ backgroundColor: 'transparent', border: 'none', outline: 'none'}}
+                  className='w-[17rem]'
                 />
               </div>
               {touched.studentNumber && errors.studentNumber ? (
@@ -102,17 +109,20 @@ const LoginComponent = () => {
               ) : null}
             </div>
             <div className='flex flex-col'>
-              <label htmlFor="password">Password:</label>
-              <div className='border-4'>
+              <label htmlFor="password" className='font-semibold mb-2'>Password:</label>
+              <div className='border-2 border-black py-3 px-2 rounded-lg flex gap-2 w-[20rem] justify-evenly'>
+                <div><img src='./passward-icon.svg'/></div>
                 <input
                   id="password"
-                  type="password"
+                  type={passwardVisible? 'text':'password'}
                   name="password"
                   placeholder="Enter Password"
                   onChange={handleChange}
                   onBlur={handleBlur}
                   value={values.password}
+                  style={{ backgroundColor: 'transparent', border: 'none', outline: 'none'}}
                 />
+                <div className='cursor-pointer' onClick={togglepassword}><img src='./passward-eye.svg'/></div>
               </div>
               {touched.password && errors.password ? (
                 <div className="text-red-500">{errors.password}</div>
@@ -122,7 +132,7 @@ const LoginComponent = () => {
               <button
                 type="submit"
                 disabled={disabled}
-                className='border-2 m-5 px-5 py-1'
+                className='m-5 px-5 rounded-lg bg-[#546CFF] w-[20rem] py-3 text-[#EAEEFF] font-medium'
               >
                 Login
               </button>
