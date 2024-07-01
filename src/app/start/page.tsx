@@ -6,6 +6,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { setQuestionsState } from '@/store/questionStateSlice';
 import { setActiveQuestionNumber } from '@/store/questionSlice';
+import Timer from '@/components/Timer';
 
 type option = {
     desc: string,
@@ -28,23 +29,22 @@ export default function page() {
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const [idx, setIdx] = useState<number>(activeQuestionNumber);
     const changeState = (type: string) => {
-        let temp: questionType[] = []
+        let temp: questionType[] = [];
         allQuestions.forEach(element => {
             if (element.quesId == activeQuestionNumber) {
-                temp.push({ ...element, state: type })
-            }
-            else {
-                temp.push(element)
+                temp.push({ ...element, state: type });
+            } else {
+                temp.push(element);
             }
         });
         if (activeQuestionNumber == 25) {
-            dispatch(setActiveQuestionNumber(1))
+            dispatch(setActiveQuestionNumber(1));
+        } else {
+            dispatch(setActiveQuestionNumber(activeQuestionNumber + 1));
         }
-        else {
-            dispatch(setActiveQuestionNumber(activeQuestionNumber + 1))
-        }
-        dispatch(setQuestionsState(temp))
-    }
+        dispatch(setQuestionsState(temp));
+    };
+    
 
     return (
         <div className='bg-[#EAEEFF] h-screen relative'>
@@ -53,9 +53,7 @@ export default function page() {
                     <img src="./icons/csi_logo.svg" alt="" className='px-3 w-[50px]' />
                     <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                 </div>
-                <span className='text-lg'>
-                    Time Left : <span>03:00:00 hr</span>
-                </span>
+                <Timer/>
             </div>
             <div className='flex ml-[50%] -translate-x-[50%]'>
                 {['HTML', 'SQL', 'CSS', 'Aptitude', 'Language'].map((element, id) => (
@@ -74,9 +72,10 @@ export default function page() {
                         </div>
                     ))}
                     <div className='mt-[19vh]'>
-                        <button className='bg-[#546CFF] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium'>Review</button>
+                    <button className='bg-[#546CFF] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("R")}>Review</button>
                         <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("A")}>Save & Next</button>
-                        <button className='bg-yellow-400 w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("NA")}>Skip</button>
+                        <button className='bg-[#FF122E] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("NA")}>Skip</button>
+                       
                     </div>
                 </div>
                 <div className='w-[25%] h-[72vh] bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 flex flex-col justify-center items-center'>
