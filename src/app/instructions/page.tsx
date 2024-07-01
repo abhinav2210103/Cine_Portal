@@ -1,85 +1,116 @@
 'use client'
+
 import React, { ChangeEvent, useState } from 'react';
 
-const InstructionsPage = () => {
-    // State to manage the input value for starting the exam
+const Instruction = () => {
     const [start, setStart] = useState<string>("");
-    // State to manage the dropdown open/close status
     const [open, setOpen] = useState<boolean>(false);
+    const [isChecked, setIsChecked] = useState<boolean>(false);
 
-    // Handler for the input change event
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setStart(event.target.value);
     };
 
-    return (
-        <div className='flex justify-evenly items-center h-screen w-full overflow-clip'>
-            {/* Decorative upper square patterns */}
-            <div className='w-[200px] h-[200px] bg-[#763fe517] rotate-45 absolute right-[420px] -top-28'></div>
-            <div className='w-[200px] h-[200px] bg-[#7bceef28] rotate-45 absolute right-[260px] -top-28'></div>
-            <div className='w-[200px] h-[200px] bg-[#763fe515] rotate-45 absolute right-[90px] -top-28'></div>
-            <div className='w-[400px] h-[400px] bg-[#7bceef18] rotate-45 absolute -right-[200px] -top-12'></div>
-            {/* Decorative circle pattern */}
-            <div className='w-[350px] h-[350px] rounded-full bg-[#7bceef41] rotate-45 absolute -right-[250px] top-[300px]'></div>
-            {/* Decorative bottom square patterns */}
-            <div className='w-[200px] h-[200px] bg-[#81cff12f] rotate-45 absolute left-[20px] -bottom-24'></div>
-            <div className='w-[200px] h-[200px] bg-[#18a7e41a] rotate-45 absolute left-[180px] -bottom-36'></div>
+    const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
+        setIsChecked(event.target.checked);
+    };
 
-            {/* Main content container */}
-            <div className='w-[65%] z-10 h-[90vh] flex flex-col justify-between items-center'>
-                {/* Instructions container */}
-                <div className='w-full z-10 h-[70%] bg-white shadow-[0px_0px_20px_0px_#00000040] rounded-lg'>
-                    <h1 className='font-semibold py-4 px-5 text-lg rounded-lg bg-gradient-to-r from-[#baeff9bf] to-[#d5d6fa]'>INSTRUCTIONS</h1>
-                    <ul className='list-disc w-[90%] text-justify m-auto font-medium'>
-                        <li className='my-4'>Every student should check the exam date-sheet and time (session) of the examination.</li>
-                        <li className='my-4'>Any student who is late by more than 30 minutes after commencement of examination shall not be permitted to enter the examination hall.</li>
-                        <li className='my-4'>All the students should carry a valid College Identity card and Admit Card without which they shall not be permitted to write the examination.</li>
-                        <li className='my-4'>No reading material is permitted inside the examination room.</li>
-                        <li className='my-4'>Use of electronic gadgets (smart phones, smart watches etc.) is strictly prohibited. Anyone in possession is liable for disciplinary action.</li>
-                        <li className='my-4'>There will be total 5 sections- HTML, SQL, CSS, Aptitude and one Language of your choice.</li>
-                    </ul>
+    const circleData = [
+        { src: '/icons/redCircle.png', text: 'Not Answered' },
+        { src: '/icons/yellowCircle.png', text: 'Review' },
+        { src: '/icons/blueCircle.png', text: 'Answered & Review' },
+        { src: '/icons/greenCircle.png', text: 'Answered' }
+    ];
+
+    return (
+        <div className='bg-[#EAEEFF] min-h-screen min-w-screen'>
+            <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
+                <div className='flex justify-center items-center'>
+                    <img src="/icons/csi_logo.svg" alt="" className='px-3 w-[50px]' />
+                    <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                 </div>
-                {/* Input container */}
-                <div className='w-full flex justify-center items-center h-[28%] shadow-[0px_0px_20px_0px_#00000040] rounded-lg'>
-                    <div className='flex flex-col'>
-                        <span className='text-sm text-center mb-2 text-gray-500'>Write START to start your exam</span>
-                        <input
-                            className='shadow-[0px_0px_20px_0px_#00000040] focus:outline-none rounded-md p-3'
-                            type="text"
-                            value={start}
-                            onChange={handleChange}
-                        />
+            </div>
+
+            <div className='flex flex-col items-center'>
+                <div className='w-[90%] h-[100%] flex flex-col justify-between items-center'>
+                    <div className='p-5 mt-6 relative bg-cover bg-center' style={{ backgroundImage: "url('/icons/bg.png')" }}>
+                        <h1 className='font-bold mb-4 text-xl'>INSTRUCTIONS</h1>
+                        <div className='flex'>
+                            <img src='/icons/verticalLine.png' style={{ height: '60%' }} />
+                            <ul className='list-disc w-[90%] text-justify ml-7 font-medium text-lg'>
+                                <li>Do not navigate away from the exam window during the exam.</li>
+                                <li className='my-3'>You cannot pause or resume the exam once you begin.</li>
+                                <li className='my-3'>Read each question carefully and choose the best answer.</li>
+                                <li className='my-3'>In case of unexpected technical difficulties, such as a power outage or internet disruption, try refreshing the webpage first.</li>
+                                <li className='my-3'>If the issue persists, do not close the browser window.</li>
+                                <li className='my-3'>Immediately contact your instructor or exam proctor via the designated communication channel.</li>
+                                <li className='my-3'>Plagiarism and cheating of any kind will not be tolerated.</li>
+                                <li className='my-3'>You are expected to complete the exam independently and according to the instructions provided.</li>
+                                <li className='my-3'>Any violation of academic integrity will result in disciplinary action.</li>
+                            </ul>
+                        </div>
+
+                        <div className='mt-4 font-semibold text-lg'>
+                            <p>The following color represents the categories of question which you Answered, Not Answered, Answered and mark for Review, Not Answered and marked for review.</p>
+                        </div>
+
+                        <div className='flex justify-around w-full mt-4'>
+                            {circleData.map((item, index) => (
+                                <div key={index} className='flex items-center'>
+                                    <img src={item.src} alt={`${item.text} Circle`} className='w-6 h-6' />
+                                    <div className='font-medium pl-2'>{item.text}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className='flex justify-start'>
+                        <div className='w-[40%] mt-7 pb-4'>
+                            <div className='w-[96%] h-[100%] flex flex-col pl-8 rounded-lg' style={{ backgroundImage: "url('/icons/SelectLanguagebg.png')" }}>
+                                <span className='my-6 font-bold text-lg'>Select Language</span>
+                                <select
+                                    className='p-3 mb-12 px-8 w-[80%] rounded-xl bg-[#EAEEFF] appearance-none cursor-pointer focus:outline-none font-medium'
+                                    onClick={() => setOpen(!open)}
+                                >
+                                    <option value=""></option>
+                                    <option value="c++">C++</option>
+                                    <option value="c">C</option>
+                                    <option value="py">Python</option>
+                                    <option value="java">Java</option>
+                                </select>
+                                <div className={` absolute transition-all duration-300 left-[22%]  mt-24 transform ${open ? 'rotate-180' : 'rotate-0'}`}><img src='/icons/DropDown.png'></img></div>
+                            </div>
+                        </div>
+
+                        <div className='w-[100%] h-full flex flex-col rounded-lg mt-7 ml-3' style={{ backgroundImage: "url('/icons/Startbg.png')" }}>
+                            <div className='flex text-base mb-5 mt-5 pl-3 pr-4 font-bold'>
+                                <input type='checkbox' className='rounded w-5 h-5 mt-0.5' onChange={handleCheckboxChange} />
+                                <span className='pl-2'>
+                                    I hereby confirm that I have read all the instructions and am ready to begin my test. Write START in the Text Box to enable Start Button
+                                </span>
+                            </div>
+
+                            <div className='flex justify-end mb-8 pr-4'>
+                                <input
+                                    className='w-[20%] border border-black focus:outline-none rounded-lg p-3 text-center bg-transparent placeholder-gray-500'
+                                    type="text"
+                                    value={start}
+                                    onChange={handleChange}
+                                    placeholder="START"
+                                />
+                                <button
+                                    disabled={!(start === "START" && isChecked)}
+                                    className={`${!(start === "START" && isChecked) ? 'bg-gray-300 text-gray-600' : 'bg-[#546CFF] text-white'} w-[20%] rounded-xl p-2 pl-5 pr-5 ml-4 text-lg`}
+                                >
+                                    Start
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {/* Sidebar container */}
-            <div className='w-[30%] z-10 h-[90vh] flex flex-col justify-evenly items-center shadow-[0px_0px_20px_0px_#00000040] rounded-lg'>
-                {/* Dropdown container */}
-                <div className='relative w-[65%]'>
-                    <select
-                        className='bg-gradient-to-r from-[#A5F2FF80] to-[#2153F93B] p-3 px-8 w-full rounded-xl shadow-[0px_0px_20px_0px_#00000040] appearance-none cursor-pointer focus:outline-none font-bold'
-                        onClick={() => setOpen(!open)}
-                    >
-                        <option value="">Select a Language</option>
-                        <option value="c">C</option>
-                        <option value="cpp">C++</option>
-                        <option value="py">Python</option>
-                        <option value="java">Java</option>
-                    </select>
-                    {/* Dropdown arrow icon */}
-                    <div className='font-bold absolute transition-all duration-300 right-5 -translate-y-[50%] top-[28%]' style={{ transform: `${open ? 'rotateZ(180deg)' : 'rotateZ(0deg)'}` }}>▼</div>
-                </div>
-                {/* Save & Next button */}
-                <button
-                    disabled={start !== "START"}
-                    className={`${start !== "START" ? 'bg-gray-300 text-gray-600 w-[80%] py-4 rounded-xl' : 'bg-blue-300 text-black w-[80%] py-4 rounded-xl'}`}
-                >
-                    Save & Next &rarr;
-                </button>
-            </div>
         </div>
-    )
+    );
 }
 
-export default InstructionsPage;
+export default Instruction;
