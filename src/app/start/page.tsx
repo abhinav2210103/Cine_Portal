@@ -1,5 +1,5 @@
 'use client'
-import React, { act, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import allQuestions from '../../constants/dummyQuestions.json'
 import { QuesNoCard } from '@/components/QuesNoCard';
 import { useDispatch, useSelector } from 'react-redux';
