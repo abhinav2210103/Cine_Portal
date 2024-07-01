@@ -1,5 +1,3 @@
-"use client";
-
 import { configureStore } from "@reduxjs/toolkit";
 import questionReducer from "./questionSlice";
 import questionStateReducer from "./questionStateSlice";

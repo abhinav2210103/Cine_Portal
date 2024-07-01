@@ -1,18 +1,17 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import allQuestions from '../../constants/dummyQuestions.json'
 import { QuesNoCard } from '@/components/QuesNoCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { setQuestionsState } from '@/store/questionStateSlice';
 import { setActiveQuestionNumber } from '@/store/questionSlice';
 
-type option = {
+interface option {
     desc: string,
     id: number,
 }
 
-type questionType = {
+interface questionType {
     state: string,
     quesId: number,
     subject: string,
@@ -23,6 +22,7 @@ type questionType = {
 
 export default function page() {
     const [questions, setQuestions] = useState<questionType[]>([]);
+    const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Language']);
     const dispatch = useDispatch();
     const activeQuestionNumber = useSelector((state: RootState) => state.question.activeQuestionNumber);
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
@@ -30,14 +30,9 @@ export default function page() {
     const changeState = (type: string) => {
         let temp: questionType[] = []
         allQuestions.forEach(element => {
-            if (element.quesId == activeQuestionNumber) {
-                temp.push({ ...element, state: type })
-            }
-            else {
-                temp.push(element)
-            }
+            element.quesId == activeQuestionNumber ? temp.push({ ...element, state: type }) : temp.push(element)
         });
-        if (activeQuestionNumber == 25) {
+        if (activeQuestionNumber == allQuestions.length) {
             dispatch(setActiveQuestionNumber(1))
         }
         else {
@@ -58,7 +53,7 @@ export default function page() {
                 </span>
             </div>
             <div className='flex ml-[50%] -translate-x-[50%]'>
-                {['HTML', 'SQL', 'CSS', 'Aptitude', 'Language'].map((element, id) => (
+                {navMenu?.map((element, id) => (
                     <div key={id} className={`w-[120px] shadow-md hover:text-white font-medium mt-5 hover:bg-[#546CFF] cursor-pointer bg-white flex justify-center items-center px-10 py-2  mx-[2px] transition-all duration-500 ${id == 0 ? "rounded-l-lg" : null} ${id == 4 ? "rounded-r-lg" : null}`}>{element}</div>
                 ))}
             </div>
@@ -84,7 +79,7 @@ export default function page() {
                         Questions
                     </div>
                     <div className='flex w-[90%] justify-around flex-wrap mt-2 h-[44vh] overflow-y-scroll'>
-                        {Array.from({ length: 25 }, (_, index) => index + 1).map((i, id) => (
+                        {Array.from({ length: allQuestions.length }, (_, index) => index + 1).map((i, id) => (
                             <div key={id}>
                                 <QuesNoCard id={id} state={id == 0 ? "V" : "UV"} />
                             </div>
