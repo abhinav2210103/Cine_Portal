@@ -1,85 +1,91 @@
-'use client'
-import React, { ChangeEvent, useState } from 'react';
+import React from 'react';
+import Image from 'next/image';
+import StartButton from './components/StartButton';
+import SelectLanguageDropdown from './components/SelectLanguageDropdown';
 
-const InstructionsPage = () => {
-    // State to manage the input value for starting the exam
-    const [start, setStart] = useState<string>("");
-    // State to manage the dropdown open/close status
-    const [open, setOpen] = useState<boolean>(false);
+export default function Instruction() {
 
-    // Handler for the input change event
-    const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-        setStart(event.target.value);
-    };
+    const circleData = [
+        { src: '/icons/redCircle.png', text: 'Not Answered' },
+        { src: '/icons/yellowCircle.png', text: 'Review' },
+        { src: '/icons/blueCircle.png', text: 'Answered & Review' },
+        { src: '/icons/greenCircle.png', text: 'Answered' }
+    ];
+
+    const instructions = [
+        "Do not navigate away from the exam window during the exam.",
+        "You cannot pause or resume the exam once you begin.",
+        "Read each question carefully and choose the best answer.",
+        "In case of unexpected technical difficulties, such as a power outage or internet disruption, try refreshing the webpage first.",
+        "If the issue persists, do not close the browser window.",
+        "Immediately contact your instructor or exam proctor via the designated communication channel.",
+        "Plagiarism and cheating of any kind will not be tolerated.",
+        "You are expected to complete the exam independently and according to the instructions provided.",
+        "Any violation of academic integrity will result in disciplinary action."
+    ];
+
+    const languages = [
+        { value: "", label: "" },
+        { value: "c++", label: "C++" },
+        { value: "c", label: "C" },
+        { value: "py", label: "Python" },
+        { value: "java", label: "Java" }
+    ];
 
     return (
-        <div className='flex justify-evenly items-center h-screen w-full overflow-clip'>
-            {/* Decorative upper square patterns */}
-            <div className='w-[200px] h-[200px] bg-[#763fe517] rotate-45 absolute right-[420px] -top-28'></div>
-            <div className='w-[200px] h-[200px] bg-[#7bceef28] rotate-45 absolute right-[260px] -top-28'></div>
-            <div className='w-[200px] h-[200px] bg-[#763fe515] rotate-45 absolute right-[90px] -top-28'></div>
-            <div className='w-[400px] h-[400px] bg-[#7bceef18] rotate-45 absolute -right-[200px] -top-12'></div>
-            {/* Decorative circle pattern */}
-            <div className='w-[350px] h-[350px] rounded-full bg-[#7bceef41] rotate-45 absolute -right-[250px] top-[300px]'></div>
-            {/* Decorative bottom square patterns */}
-            <div className='w-[200px] h-[200px] bg-[#81cff12f] rotate-45 absolute left-[20px] -bottom-24'></div>
-            <div className='w-[200px] h-[200px] bg-[#18a7e41a] rotate-45 absolute left-[180px] -bottom-36'></div>
-
-            {/* Main content container */}
-            <div className='w-[65%] z-10 h-[90vh] flex flex-col justify-between items-center'>
-                {/* Instructions container */}
-                <div className='w-full z-10 h-[70%] bg-white shadow-[0px_0px_20px_0px_#00000040] rounded-lg'>
-                    <h1 className='font-semibold py-4 px-5 text-lg rounded-lg bg-gradient-to-r from-[#baeff9bf] to-[#d5d6fa]'>INSTRUCTIONS</h1>
-                    <ul className='list-disc w-[90%] text-justify m-auto font-medium'>
-                        <li className='my-4'>Every student should check the exam date-sheet and time (session) of the examination.</li>
-                        <li className='my-4'>Any student who is late by more than 30 minutes after commencement of examination shall not be permitted to enter the examination hall.</li>
-                        <li className='my-4'>All the students should carry a valid College Identity card and Admit Card without which they shall not be permitted to write the examination.</li>
-                        <li className='my-4'>No reading material is permitted inside the examination room.</li>
-                        <li className='my-4'>Use of electronic gadgets (smart phones, smart watches etc.) is strictly prohibited. Anyone in possession is liable for disciplinary action.</li>
-                        <li className='my-4'>There will be total 5 sections- HTML, SQL, CSS, Aptitude and one Language of your choice.</li>
-                    </ul>
+        <div className='bg-[#EAEEFF] min-h-screen min-w-screen'>
+            <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
+                <div className='flex justify-center items-center'>
+                    <Image src="/icons/csi_logo.svg" alt="" width={50} height={50} className='px-3' />
+                    <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                 </div>
-                {/* Input container */}
-                <div className='w-full flex justify-center items-center h-[28%] shadow-[0px_0px_20px_0px_#00000040] rounded-lg'>
-                    <div className='flex flex-col'>
-                        <span className='text-sm text-center mb-2 text-gray-500'>Write START to start your exam</span>
-                        <input
-                            className='shadow-[0px_0px_20px_0px_#00000040] focus:outline-none rounded-md p-3'
-                            type="text"
-                            value={start}
-                            onChange={handleChange}
-                        />
+            </div>
+
+            <div className='flex flex-col items-center'>
+                <div className='w-[90%] h-[100%] flex flex-col justify-between items-center'>
+                    <div className='p-5 mt-6 relative bg-cover bg-center' style={{ backgroundImage: "url('/icons/bg.png')" }}>
+                        <h1 className='font-bold mb-4 text-2xl ml-3'>INSTRUCTIONS</h1>
+                        <div className='flex'>
+                            <Image src='/icons/verticalLine.png' alt="Vertical Line" width={5} height={50}  />
+                            <ul className='list-disc w-[90%] text-justify ml-7 font-medium text-lg'>
+                                {instructions.map((instruction, index) => (
+                                    <li key={index} className='mb-3'>{instruction}</li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        <div className='mt-4 font-semibold text-lg ml-3'>
+                            <p>The following color represents the categories of question which you Answered, Not Answered, Answered and mark for Review, Not Answered and marked for review.</p>
+                        </div>
+
+                        <div className='flex justify-around w-full mt-4'>
+                            {circleData.map((item, index) => (
+                                <div key={index} className='flex items-center'>
+                                    <Image src={item.src} alt={`${item.text} Circle`} width={24} height={24} />
+                                    <div className='font-medium pl-2'>{item.text}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className='flex justify-start'>
+                        <div className='w-[40%] mt-7 pb-4'>
+                            <div className='w-[96%] h-[100%] flex flex-col pl-8 rounded-lg' style={{ backgroundImage: "url('/icons/SelectLanguagebg.png')" }}>
+                                <span className='my-6 font-bold text-lg'>Select Language</span>
+                                
+                                <SelectLanguageDropdown />
+                                
+                            </div>
+                        </div>
+
+                        <div className='w-[100%] h-full flex flex-col rounded-lg mt-7 ml-3' style={{ backgroundImage: "url('/icons/Startbg.png')" }}>
+                            <StartButton />
+                        </div>
                     </div>
                 </div>
             </div>
-
-            {/* Sidebar container */}
-            <div className='w-[30%] z-10 h-[90vh] flex flex-col justify-evenly items-center shadow-[0px_0px_20px_0px_#00000040] rounded-lg'>
-                {/* Dropdown container */}
-                <div className='relative w-[65%]'>
-                    <select
-                        className='bg-gradient-to-r from-[#A5F2FF80] to-[#2153F93B] p-3 px-8 w-full rounded-xl shadow-[0px_0px_20px_0px_#00000040] appearance-none cursor-pointer focus:outline-none font-bold'
-                        onClick={() => setOpen(!open)}
-                    >
-                        <option value="">Select a Language</option>
-                        <option value="c">C</option>
-                        <option value="cpp">C++</option>
-                        <option value="py">Python</option>
-                        <option value="java">Java</option>
-                    </select>
-                    {/* Dropdown arrow icon */}
-                    <div className='font-bold absolute transition-all duration-300 right-5 -translate-y-[50%] top-[28%]' style={{ transform: `${open ? 'rotateZ(180deg)' : 'rotateZ(0deg)'}` }}>▼</div>
-                </div>
-                {/* Save & Next button */}
-                <button
-                    disabled={start !== "START"}
-                    className={`${start !== "START" ? 'bg-gray-300 text-gray-600 w-[80%] py-4 rounded-xl' : 'bg-blue-300 text-black w-[80%] py-4 rounded-xl'}`}
-                >
-                    Save & Next &rarr;
-                </button>
-            </div>
         </div>
-    )
+    );
 }
 
-export default InstructionsPage;
+
