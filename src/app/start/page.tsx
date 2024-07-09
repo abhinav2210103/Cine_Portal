@@ -1,10 +1,12 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { BaseSyntheticEvent, EventHandler, MouseEventHandler, useEffect, useState } from 'react'
 import { QuesNoCard } from '@/components/QuesNoCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
 import { setQuestionsState } from '@/store/questionStateSlice';
 import { setActiveQuestionNumber } from '@/store/questionSlice';
+import toast, { Toaster } from 'react-hot-toast';
+import Loader from '@/components/Loader/Loader';
 
 interface option {
     desc: string,
@@ -17,20 +19,23 @@ interface questionType {
     subject: string,
     question: string,
     options: option[],
+    recordedAns: number,
     answer: number
 }
 
 export default function page() {
     const [questions, setQuestions] = useState<questionType[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Language']);
     const dispatch = useDispatch();
     const activeQuestionNumber = useSelector((state: RootState) => state.question.activeQuestionNumber);
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const [idx, setIdx] = useState<number>(activeQuestionNumber);
-    const changeState = (type: string) => {
+    const [answer, setAnswer] = useState<string>("")
+    const changeState = (type: string, ansId: number) => {
         let temp: questionType[] = []
         allQuestions.forEach(element => {
-            element.quesId == activeQuestionNumber ? temp.push({ ...element, state: type }) : temp.push(element)
+            element.quesId == activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element)
         });
         if (activeQuestionNumber == allQuestions.length) {
             dispatch(setActiveQuestionNumber(1))
@@ -41,8 +46,24 @@ export default function page() {
         dispatch(setQuestionsState(temp))
     }
 
+    const getQuestions = async () => {
+        const res = await fetch("https://cine-student.onrender.com/student/questions?subject=Java&userId=6676a99b91436f80e4dd9821");
+        let data = await res.json();
+        for (let index = 0; index < data.length; index++) {
+            data[index] = { ...data[index], quesId: index + 1, state: "UA", recordedAns: 0 }
+        }
+        console.log(data)
+        dispatch(setQuestionsState(data))
+        setLoading(false)
+    }
+
+    useEffect(() => {
+        getQuestions()
+    }, [])
+
     return (
-        <div className='bg-[#EAEEFF] h-screen relative'>
+        <div><Toaster />{loading ? <Loader /> : <div className='bg-[#EAEEFF] h-screen relative'>
+
             <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
                 <div className='flex justify-center items-center'>
                     <img src="./icons/csi_logo.svg" alt="" className='px-3 w-[50px]' />
@@ -63,15 +84,30 @@ export default function page() {
                     <hr />
                     <h1 className='font-semibold text-xl py-2'>{allQuestions[activeQuestionNumber - 1]?.question}</h1>
                     {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
-                        <div key={id} className='my-4 cursor-pointer'>
-                            <input type="radio" className='mr-6 cursor-pointer' name={`opt`} id={`opt${activeQuestionNumber}${i.id}`} />
+                        <div key={id} className='my-4 cursor-pointer' >
+                            <input type="radio" checked={i.id == allQuestions[activeQuestionNumber - 1].recordedAns || answer == i.desc} onChange={() => {
+                                setAnswer(i.desc)
+                            }} name={`opt${activeQuestionNumber}${i.id}`} id={`opt${activeQuestionNumber}${i.id}`} />
                             <label className='ml-2 text-[17px] font-medium cursor-pointer' htmlFor={`opt${activeQuestionNumber}${i.id}`}>{i.desc}</label>
                         </div>
                     ))}
                     <div className='mt-[19vh]'>
                         <button className='bg-[#546CFF] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium'>Review</button>
-                        <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("A")}>Save & Next</button>
-                        <button className='bg-yellow-400 w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("NA")}>Skip</button>
+                        <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => {
+                            let temp: questionType[] = []
+                            let ansId: number = 0;
+                            allQuestions[activeQuestionNumber - 1].options.forEach(option => {
+                                if (option.desc == answer) {
+                                    ansId = option.id
+                                }
+                            })
+                            if (ansId == 0) {
+                                toast.error("Please select an answer")
+                                return
+                            }
+                            changeState("A", ansId)
+                        }}>Save & Next</button>
+                        <button className='bg-yellow-400 w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("NA", 0)}>Skip</button>
                     </div>
                 </div>
                 <div className='w-[25%] h-[72vh] bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 flex flex-col justify-center items-center'>
@@ -89,7 +125,7 @@ export default function page() {
                 </div>
             </div>
             <img src="./icons/bg_logo.svg" alt="" className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
-        </div>
+        </div>}</div>
     )
 }
 
