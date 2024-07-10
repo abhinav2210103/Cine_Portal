@@ -8,6 +8,7 @@ import { setActiveQuestionNumber } from '@/store/questionSlice';
 import toast, { Toaster } from 'react-hot-toast';
 import Loader from '@/components/Loader/Loader';
 import { questionFetcher } from '@/constants/questionFetcher';
+import Image from 'next/image';
 
 interface option {
     desc: string,
@@ -69,7 +70,7 @@ export default function page() {
             data[index] = { ...data[index], quesId: index + 1, state: "UA", recordedAns: 0 }
         }
         dispatch(setQuestionsState(data))
-        setLoading(false)
+        // setLoading(false)
     }
 
     useEffect(() => {
@@ -81,7 +82,7 @@ export default function page() {
 
             <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
                 <div className='flex justify-center items-center'>
-                    <img src="./icons/csi_logo.svg" alt="" className='px-3 w-[50px]' />
+                    <Image src="./icons/csi_logo.svg" width={50} height={50} alt="csiLogo" className='px-3 w-[50px]' />
                     <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                 </div>
                 <span className='text-lg'>
@@ -126,7 +127,7 @@ export default function page() {
                     <button className='bg-[#546CFF] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium'>Submit</button>
                 </div>
             </div>
-            <img src="./icons/bg_logo.svg" alt="" className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
+            <Image src="./icons/bg_logo.svg" alt="bgLogo" width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
         </div>}</div>
     )
 }
