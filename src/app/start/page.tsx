@@ -1,5 +1,5 @@
 'use client'
-import React, { BaseSyntheticEvent, EventHandler, MouseEventHandler, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { QuesNoCard } from '@/components/QuesNoCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -7,6 +7,7 @@ import { setQuestionsState } from '@/store/questionStateSlice';
 import { setActiveQuestionNumber } from '@/store/questionSlice';
 import toast, { Toaster } from 'react-hot-toast';
 import Loader from '@/components/Loader/Loader';
+import { questionFetcher } from '@/constants/questionFetcher';
 
 interface option {
     desc: string,
@@ -46,13 +47,27 @@ export default function page() {
         dispatch(setQuestionsState(temp))
     }
 
+    const saveAndNextHandler = () => {
+        let ansId: number = 0;
+        allQuestions[activeQuestionNumber - 1].options.forEach(option => {
+            if (option.desc == answer) {
+                ansId = option.id
+            }
+        })
+        if (ansId == 0) {
+            toast.error("Please select an answer")
+            return
+        }
+        changeState("A", ansId)
+    }
+
     const getQuestions = async () => {
-        const res = await fetch("https://cine-student.onrender.com/student/questions?subject=Java&userId=6676a99b91436f80e4dd9821");
-        let data = await res.json();
+        let data = await questionFetcher("Java", "6676a99b91436f80e4dd9821");
+        if (data == "Error fetching the questions")
+            return;
         for (let index = 0; index < data.length; index++) {
             data[index] = { ...data[index], quesId: index + 1, state: "UA", recordedAns: 0 }
         }
-        console.log(data)
         dispatch(setQuestionsState(data))
         setLoading(false)
     }
@@ -93,20 +108,7 @@ export default function page() {
                     ))}
                     <div className='mt-[19vh]'>
                         <button className='bg-[#546CFF] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium'>Review</button>
-                        <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => {
-                            let temp: questionType[] = []
-                            let ansId: number = 0;
-                            allQuestions[activeQuestionNumber - 1].options.forEach(option => {
-                                if (option.desc == answer) {
-                                    ansId = option.id
-                                }
-                            })
-                            if (ansId == 0) {
-                                toast.error("Please select an answer")
-                                return
-                            }
-                            changeState("A", ansId)
-                        }}>Save & Next</button>
+                        <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={saveAndNextHandler}>Save & Next</button>
                         <button className='bg-yellow-400 w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("NA", 0)}>Skip</button>
                     </div>
                 </div>
