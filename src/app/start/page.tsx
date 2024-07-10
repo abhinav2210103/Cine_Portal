@@ -70,7 +70,7 @@ export default function page() {
             data[index] = { ...data[index], quesId: index + 1, state: "UA", recordedAns: 0 }
         }
         dispatch(setQuestionsState(data))
-        // setLoading(false)
+        setLoading(false)
     }
 
     useEffect(() => {
