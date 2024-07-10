@@ -1,21 +1,22 @@
 "use client";
 
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
-import allQuestions from "./../constants/dummyQuestions.json";
+import allQuestions from "@/constants/dummyQuestions.json";
 
-type option = {
+interface option {
     desc: string;
     id: number;
-};
+}
 
-type questionType = {
+interface questionType {
     state: string;
     quesId: number;
     subject: string;
     question: string;
     options: option[];
+    recordedAns: number;
     answer: number;
-};
+}
 
 interface questionStates {
     allQuestions: questionType[];

@@ -8,7 +8,7 @@ interface QuesCardProps {
     state: string,
 }
 
-const QuesNoCard: React.FC<QuesCardProps> = (props) => {
+export default function QuesNoCard(props: QuesCardProps) {
 
     const dispatch = useDispatch();
     const activeQuestionNumber = useSelector((state: RootState) => state.question.activeQuestionNumber);
