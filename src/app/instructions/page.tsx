@@ -3,6 +3,7 @@ import Image from 'next/image';
 import StartButton from './components/StartButton';
 import SelectLanguageDropdown from './components/SelectLanguageDropdown';
 
+
 export default function Instruction() {
 
     const circleData = [
@@ -33,7 +34,7 @@ export default function Instruction() {
     ];
 
     return (
-        <div className='bg-[#EAEEFF] min-h-screen min-w-screen'>
+        <div className='bg-[#EAEEFF] min-h-screen min-w-screen bg-[url("/icons/bg_logo.svg")] bg-no-repeat bg-[48%]'>
             <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
                 <div className='flex justify-center items-center'>
                     <Image src="/icons/csi_logo.svg" alt="" width={50} height={50} className='px-3' />
@@ -46,7 +47,7 @@ export default function Instruction() {
                     <div className='p-5 mt-6 relative bg-cover bg-center' style={{ backgroundImage: "url('/icons/bg.png')" }}>
                         <h1 className='font-bold mb-4 text-2xl ml-3'>INSTRUCTIONS</h1>
                         <div className='flex'>
-                            <Image src='/icons/verticalLine.png' alt="Vertical Line" width={5} height={50}  />
+                            <Image src='/icons/verticalLine.png' alt="Vertical Line" width={5} height={50} />
                             <ul className='list-disc w-[90%] text-justify ml-7 font-medium text-lg'>
                                 {instructions.map((instruction, index) => (
                                     <li key={index} className='mb-3'>{instruction}</li>
@@ -87,5 +88,4 @@ export default function Instruction() {
         </div>
     );
 }
-
 
