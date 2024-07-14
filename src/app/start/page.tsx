@@ -9,7 +9,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import Loader from '@/components/Loader/Loader';
 import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
-import Timer from '@/components/Timer';
 
 interface option {
     desc: string,
@@ -86,7 +85,9 @@ export default function page() {
                     <Image src="./icons/csi_logo.svg" width={50} height={50} alt="csiLogo" className='px-3 w-[50px]' />
                     <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                 </div>
-                <Timer/>
+                <span className='text-lg'>
+                    Time Left : <span>03:00:00 hr</span>
+                </span>
             </div>
             <div className='flex ml-[50%] -translate-x-[50%]'>
                 {navMenu?.map((element, id) => (
@@ -107,10 +108,9 @@ export default function page() {
                         </div>
                     ))}
                     <div className='mt-[19vh]'>
-                    <button className='bg-[#546CFF] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("R")}>Review</button>
-                        <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("A")}>Save & Next</button>
-                        <button className='bg-[#FF122E] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("NA")}>Skip</button>
-                       
+                        <button className='bg-[#546CFF] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium'>Review</button>
+                        <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={saveAndNextHandler}>Save & Next</button>
+                        <button className='bg-yellow-400 w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("NA", 0)}>Skip</button>
                     </div>
                 </div>
                 <div className='w-[25%] h-[72vh] bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 flex flex-col justify-center items-center'>
@@ -131,6 +131,5 @@ export default function page() {
         </div>}</div>
     )
 }
-
 
 
