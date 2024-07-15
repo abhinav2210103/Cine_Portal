@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react';
 import { QuesNoCard } from '@/components/QuesNoCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -26,7 +26,7 @@ interface questionType {
     answer: number
 }
 
-export default function page() {
+export default function Page() {
     const [questions, setQuestions] = useState<questionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Language']);
@@ -86,7 +86,7 @@ export default function page() {
                     <Image src="./icons/csi_logo.svg" width={50} height={50} alt="csiLogo" className='px-3 w-[50px]' />
                     <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                 </div>
-                <Timer/>
+                <Timer />
             </div>
             <div className='flex ml-[50%] -translate-x-[50%]'>
                 {navMenu?.map((element, id) => (
@@ -130,5 +130,3 @@ export default function page() {
         </div>}</div>
     )
 }
-
-
