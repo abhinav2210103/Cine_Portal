@@ -1,13 +1,14 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import "../app/globals.css";
-import RootLayout from "@/app/layout";
 import { FaEye, FaEyeSlash, FaUser, FaKey } from "react-icons/fa";
 import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { useFormik } from "formik";
 import validationSchema from "@/app/constants/validationSchema";
 import ClipLoader from "react-spinners/ClipLoader";
+import { useRouter } from "next/router";
+
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 export default function Login(): React.ReactElement {
   return (
@@ -25,9 +26,9 @@ const LoginComponent = () => {
   const { executeRecaptcha } = useGoogleReCaptcha();
   const [disabled, setDisabled] = useState<boolean>(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState<boolean>(false);
+  const router = useRouter();
 
   useEffect(() => {
-    console.log("reCAPTCHA Key:", recaptchaKey);
     const Backgroundimage = new Image();
     Backgroundimage.src = "./cine-bg.png";
     Backgroundimage.onload = () => {
@@ -50,7 +51,6 @@ const LoginComponent = () => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      console.log(values);
       setDisabled(true);
       try {
         if (!executeRecaptcha) {
@@ -69,17 +69,17 @@ const LoginComponent = () => {
             credentials: "include",
           }
         );
-
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
         console.log("Login successful:", data);
         resetForm();
+        router.push("/instructions"); 
       } catch (error) {
         console.error("Login failed:", error);
       } finally {
-        setDisabled(false);
+        setDisabled(false); 
       }
     },
   });
@@ -169,9 +169,13 @@ const LoginComponent = () => {
                   <button
                     type="submit"
                     disabled={disabled}
-                    className="m-5 px-5 rounded-lg bg-[#546CFF] w-[20rem] py-3 text-[#EAEEFF] font-medium"
+                    className="m-5 px-5 rounded-lg h-[3rem] bg-[#546CFF] w-[20rem] py-3 text-[#EAEEFF] font-medium flex items-center justify-center"
                   >
-                    Login
+                    {disabled ? (
+                      <ClipLoader color="#EAEEFF" size={30} />
+                    ) : (
+                      "Login"
+                    )}
                   </button>
                 </div>
               </form>
