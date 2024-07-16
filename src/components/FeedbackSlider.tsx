@@ -1,10 +1,6 @@
 import React, { useState } from 'react';
 import { Slider, styled } from '@mui/material';
 
-import image1 from '../../public/emoji-1.svg';
-import image2 from '../../public/emoji-2.svg';
-import image3 from '../../public/emoji-3.svg';
-import image4 from '../../public/emoji-4.svg';
 
 const imageMap: { [key: number]: string } = {
   1: '/emoji-1.svg', 

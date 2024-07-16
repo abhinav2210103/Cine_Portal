@@ -29,7 +29,6 @@
 // }
 
 'use client'
-import Image from 'next/image';
 import React, { ChangeEvent, useState } from 'react';
 
 export default function SelectLanguageDropdown() {
@@ -81,7 +80,7 @@ export default function SelectLanguageDropdown() {
                 ))}
             </select>
             <div className={`absolute transition-all duration-300 left-[22%] mt-24 transform ${open ? 'rotate-180' : 'rotate-0'}`}>
-                <Image src='/icons/DropDown.png' alt='dropdown icon'/>
+                <img src='/icons/DropDown.png' />
             </div>
         </>
     );

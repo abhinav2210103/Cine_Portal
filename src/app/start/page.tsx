@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 import { QuesNoCard } from '@/components/QuesNoCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -9,7 +9,6 @@ import toast, { Toaster } from 'react-hot-toast';
 import Loader from '@/components/Loader/Loader';
 import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
-import Timer from '@/components/Timer';
 
 interface option {
     desc: string,
@@ -26,7 +25,7 @@ interface questionType {
     answer: number
 }
 
-export default function Page() {
+export default function page() {
     const [questions, setQuestions] = useState<questionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Language']);
@@ -75,9 +74,8 @@ export default function Page() {
     }
 
     useEffect(() => {
-        getQuestions();
-      }, [getQuestions]);
-      
+        getQuestions()
+    }, [])
 
     return (
         <div><Toaster />{loading ? <Loader /> : <div className='bg-[#EAEEFF] h-screen relative'>
@@ -87,7 +85,9 @@ export default function Page() {
                     <Image src="./icons/csi_logo.svg" width={50} height={50} alt="csiLogo" className='px-3 w-[50px]' />
                     <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                 </div>
-                <Timer />
+                <span className='text-lg'>
+                    Time Left : <span>03:00:00 hr</span>
+                </span>
             </div>
             <div className='flex ml-[50%] -translate-x-[50%]'>
                 {navMenu?.map((element, id) => (
@@ -131,3 +131,5 @@ export default function Page() {
         </div>}</div>
     )
 }
+
+
