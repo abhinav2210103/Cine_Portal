@@ -14,6 +14,7 @@ interface questionType {
     subject: string;
     question: string;
     options: option[];
+    recordedAns: number;
     answer: number;
 }
 

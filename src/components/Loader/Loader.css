@@ -1,0 +1,22 @@
+#c {
+    opacity: 0;
+    animation: easeInAndOut 3s ease-in-out 0s infinite;
+}
+#s {
+    opacity: 0;
+    animation: easeInAndOut 3s ease-in-out 0.3s infinite;
+}
+#i {
+    opacity: 0;
+    animation: easeInAndOut 3s ease-in-out 0.6s infinite;
+}
+
+@keyframes easeInAndOut {
+    0%,
+    100% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+}
