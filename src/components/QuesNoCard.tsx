@@ -34,6 +34,12 @@ export default function QuesNoCard(props: QuesCardProps) {
                     color: "white"
                 }
             }
+            else if (allQuestions[props.id].state == "MR") {
+                pts = {
+                    backgroundColor: '#EAB308',
+                    color: "white"
+                }
+            }
             else if (allQuestions[props.id].state == "NA") {
                 pts = {
                     backgroundColor: 'red',
