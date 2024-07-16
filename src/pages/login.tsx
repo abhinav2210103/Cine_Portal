@@ -8,7 +8,10 @@ import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { useFormik } from "formik";
 import validationSchema from "@/app/constants/validationSchema";
 import ClipLoader from "react-spinners/ClipLoader";
+import Image from "next/image";
+
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
+
 export default function Login(): React.ReactElement {
   return (
     <GoogleReCaptchaProvider
@@ -28,7 +31,7 @@ const LoginComponent = () => {
 
   useEffect(() => {
     console.log("reCAPTCHA Key:", recaptchaKey);
-    const Backgroundimage = new Image();
+    const Backgroundimage = new window.Image();
     Backgroundimage.src = "./cine-bg.png";
     Backgroundimage.onload = () => {
       setBackgroundLoaded(true);
@@ -96,7 +99,7 @@ const LoginComponent = () => {
           style={{ backgroundImage: 'url("cine-bg.png")' }}
         >
           <div className="relative bg-white bg-opacity-50 h-[13vh] w-full flex items-center justify-center gap-5">
-            <img src="./Csilogo.png" />
+            <Image src="./Csilogo.png" alt="logo" />
             <div className="font-medium text-4xl">CSI Exam Portal</div>
           </div>
 

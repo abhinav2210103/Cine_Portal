@@ -75,8 +75,9 @@ export default function Page() {
     }
 
     useEffect(() => {
-        getQuestions()
-    }, [])
+        getQuestions();
+      }, [getQuestions]);
+      
 
     return (
         <div><Toaster />{loading ? <Loader /> : <div className='bg-[#EAEEFF] h-screen relative'>
