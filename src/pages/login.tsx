@@ -74,8 +74,9 @@ const LoginComponent = () => {
         }
         const data = await response.json();
         console.log("Login successful:", data);
+        localStorage.setItem('userId', data.userId);
         resetForm();
-        router.push("/instructions"); 
+        router.push("/instructions");
       } catch (error) {
         console.error("Login failed:", error);
       } finally {
