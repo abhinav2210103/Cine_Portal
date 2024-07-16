@@ -9,6 +9,7 @@ interface option {
 }
 
 interface questionType {
+    _id: string;
     state: string;
     quesId: number;
     subject: string;
@@ -23,7 +24,7 @@ interface questionStates {
 }
 
 const initialState: questionStates = {
-    allQuestions: allQuestions,
+    allQuestions: [],
 };
 
 const questionStateSlice = createSlice({

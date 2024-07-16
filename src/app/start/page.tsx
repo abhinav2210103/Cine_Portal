@@ -9,6 +9,8 @@ import toast, { Toaster } from 'react-hot-toast';
 import Loader from '@/components/Loader/Loader';
 import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
+import { responseFetcher } from '@/constants/responseFetcher';
+import { responseSetter } from '@/constants/responseSetter';
 
 interface option {
     desc: string,
@@ -16,6 +18,7 @@ interface option {
 }
 
 interface questionType {
+    _id: string,
     state: string,
     quesId: number,
     subject: string,
@@ -28,7 +31,9 @@ interface questionType {
 export default function page() {
     const [questions, setQuestions] = useState<questionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Language']);
+    const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java']);
+    const [activeMenu, setActiveMenu] = useState<number>(0)
+    const [subject, setSubject] = useState<string>("HTML")
     const dispatch = useDispatch();
     const activeQuestionNumber = useSelector((state: RootState) => state.question.activeQuestionNumber);
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
@@ -36,8 +41,8 @@ export default function page() {
     const [answer, setAnswer] = useState<string>("")
     const changeState = (type: string, ansId: number) => {
         let temp: questionType[] = []
-        allQuestions.forEach(element => {
-            element.quesId == activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element)
+        allQuestions.forEach((element, id) => {
+            id + 1 == activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element)
         });
         if (activeQuestionNumber == allQuestions.length) {
             dispatch(setActiveQuestionNumber(1))
@@ -48,27 +53,30 @@ export default function page() {
         dispatch(setQuestionsState(temp))
     }
 
-    const saveAndNextHandler = () => {
+    const buttonHandler = (state: string) => {
         let ansId: number = 0;
-        allQuestions[activeQuestionNumber - 1].options.forEach(option => {
+        allQuestions[activeQuestionNumber - 1].options.forEach(async option => {
             if (option.desc == answer) {
                 ansId = option.id
+                await responseSetter("6676a99b91436f80e4dd9821", allQuestions[activeQuestionNumber - 1]._id, state == "MR" ? 2 : 1, ansId)
+                changeState(state, ansId)
+                setAnswer("")
             }
         })
         if (ansId == 0) {
             toast.error("Please select an answer")
             return
         }
-        changeState("A", ansId)
     }
 
     const getQuestions = async () => {
-        let data = await questionFetcher("Java", "6676a99b91436f80e4dd9821");
-        if (data == "Error fetching the questions")
-            return;
-        for (let index = 0; index < data.length; index++) {
-            data[index] = { ...data[index], quesId: index + 1, state: "UA", recordedAns: 0 }
+        let responses = await responseFetcher("6676a99b91436f80e4dd9821");
+        let data: questionType[] = [];
+        for (let i = 0; i < navMenu.length; i++) {
+            let temp = await questionFetcher(navMenu[i], "6676a99b91436f80e4dd9821", responses)
+            data = [...data, ...temp];
         }
+        console.log(data)
         dispatch(setQuestionsState(data))
         setLoading(false)
     }
@@ -91,7 +99,10 @@ export default function page() {
             </div>
             <div className='flex ml-[50%] -translate-x-[50%]'>
                 {navMenu?.map((element, id) => (
-                    <div key={id} className={`w-[120px] shadow-md hover:text-white font-medium mt-5 hover:bg-[#546CFF] cursor-pointer bg-white flex justify-center items-center px-10 py-2  mx-[2px] transition-all duration-500 ${id == 0 ? "rounded-l-lg" : null} ${id == 4 ? "rounded-r-lg" : null}`}>{element}</div>
+                    <div key={id} className={`w-[120px] shadow-md hover:text-white font-medium mt-5 hover:bg-[#546CFF] cursor-pointer ${activeMenu == id ? "bg-[#546CFF] text-white" : "bg-white text-black"} flex justify-center items-center px-10 py-2  mx-[2px] transition-all duration-500 ${id == 0 ? "rounded-l-lg" : null} ${id == 4 ? "rounded-r-lg" : null}`} onClick={() => {
+                        setSubject(navMenu[id])
+                        setActiveMenu(id)
+                    }}>{element}</div>
                 ))}
             </div>
             <div className='w-[94%] mt-8 m-auto flex justify-between items-center'>
@@ -101,16 +112,16 @@ export default function page() {
                     <h1 className='font-semibold text-xl py-2'>{allQuestions[activeQuestionNumber - 1]?.question}</h1>
                     {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
                         <div key={id} className='my-4 cursor-pointer' >
-                            <input type="radio" checked={i.id == allQuestions[activeQuestionNumber - 1].recordedAns || answer == i.desc} onChange={() => {
+                            <input type="radio" checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc} onChange={() => {
                                 setAnswer(i.desc)
                             }} name={`opt${activeQuestionNumber}${i.id}`} id={`opt${activeQuestionNumber}${i.id}`} />
                             <label className='ml-2 text-[17px] font-medium cursor-pointer' htmlFor={`opt${activeQuestionNumber}${i.id}`}>{i.desc}</label>
                         </div>
                     ))}
                     <div className='mt-[19vh]'>
-                        <button className='bg-[#546CFF] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium'>Review</button>
-                        <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={saveAndNextHandler}>Save & Next</button>
-                        <button className='bg-yellow-400 w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("NA", 0)}>Skip</button>
+                        <button className='bg-yellow-500 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("MR")}>Mark for Review & Next</button>
+                        <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("A")}>Save & Next</button>
+                        <button className='bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("NA", 0)}>Skip</button>
                     </div>
                 </div>
                 <div className='w-[25%] h-[72vh] bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 flex flex-col justify-center items-center'>
@@ -118,11 +129,15 @@ export default function page() {
                         Questions
                     </div>
                     <div className='flex w-[90%] justify-around flex-wrap mt-2 h-[44vh] overflow-y-scroll'>
-                        {Array.from({ length: allQuestions.length }, (_, index) => index + 1).map((i, id) => (
-                            <div key={id}>
-                                <QuesNoCard id={id} state={id == 0 ? "V" : "UV"} />
-                            </div>
-                        ))}
+                        {allQuestions.map((element, id) => {
+                            return (
+                                <>
+                                    {Math.floor(element.quesId / 100) - 1 == activeMenu && <div key={id} onClick={() => setAnswer("")}>
+                                        <QuesNoCard id={id} state={id == 0 ? "V" : "UV"} />
+                                    </div>}
+                                </>
+                            )
+                        })}
                     </div>
                     <button className='bg-[#546CFF] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium'>Submit</button>
                 </div>
