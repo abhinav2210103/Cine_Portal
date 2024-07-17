@@ -7,7 +7,7 @@ interface responseType {
     ansId: number;
 }
 
-const responseIds = ["NA", "MR", "A", "A"];
+const responseIds = ["NA", "MR", "A"];
 const subjects = ["HTML", "SQL", "CSS", "Aptitude", "Java"];
 
 async function questionFetcher(
@@ -29,8 +29,8 @@ async function questionFetcher(
                     data[index] = {
                         ...data[index],
                         quesId: 100 * (idx + 1) + index + 1,
-                        state: responseIds[responses[i].ansId],
-                        recordedAns: responses[i].status,
+                        state: responseIds[responses[i].status],
+                        recordedAns: responses[i].ansId,
                     };
                     break;
                 } else {
