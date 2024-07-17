@@ -10,7 +10,7 @@
 //         { value: "py", label: "Python" },
 //         { value: "java", label: "Java" }
 //     ];
-    
+
 
 //   return (
 //     <>
@@ -86,4 +86,4 @@ export default function SelectLanguageDropdown() {
     );
 }
 
-                            
+

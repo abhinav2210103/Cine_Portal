@@ -5,6 +5,7 @@ import React from 'react'
 import { useDispatch, useSelector } from 'react-redux';
 
 interface QuesCardProps {
+    display: number,
     id: number;
     state: string,
 }
@@ -53,7 +54,7 @@ export default function QuesNoCard(props: QuesCardProps) {
     return (
         <div key={props.id} className='w-[45px] h-[45px] shadow-md text-xl flex justify-center items-center m-4 font-bold rounded-xl cursor-pointer bg-white hover:bg-[#546CFF] hover:text-white' style={getProperties(props.id + 1)} onClick={() => {
             dispatch(setActiveQuestionNumber(props.id + 1));
-        }}>{props.id + 1}</div>
+        }}>{props.display % 100}</div>
     )
 }
 

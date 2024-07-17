@@ -48,24 +48,43 @@ export default function page() {
             dispatch(setActiveQuestionNumber(1))
         }
         else {
+            setActiveMenu(Math.floor(allQuestions[activeQuestionNumber].quesId / 100) - 1)
             dispatch(setActiveQuestionNumber(activeQuestionNumber + 1))
         }
         dispatch(setQuestionsState(temp))
     }
 
-    const buttonHandler = (state: string) => {
-        let ansId: number = 0;
+    const buttonHandler = async (state: string) => {
+        let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;
+        if (["NA", "MR", "A"].indexOf(state) < ["NA", "MR", "A"].indexOf(allQuestions[activeQuestionNumber - 1].state)) {
+            toast.error("Already saved and recorded")
+            return
+        }
         allQuestions[activeQuestionNumber - 1].options.forEach(async option => {
             if (option.desc == answer) {
                 ansId = option.id
-                await responseSetter("6676a99b91436f80e4dd9821", allQuestions[activeQuestionNumber - 1]._id, state == "MR" ? 2 : 1, ansId)
-                changeState(state, ansId)
+                await responseSetter("6676a99b91436f80e4dd9821", allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
+                changeState(state, state == "NA" ? 0 : ansId)
                 setAnswer("")
+                return
             }
         })
-        if (ansId == 0) {
+        if (ansId == 0 && state != "NA") {
             toast.error("Please select an answer")
             return
+        }
+        await responseSetter("6676a99b91436f80e4dd9821", allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
+        changeState(state, state == "NA" ? 0 : ansId)
+    }
+
+
+    const clearResponseHandler = () => {
+        const currentState: string = allQuestions[activeQuestionNumber - 1]?.state
+        if (currentState != "A" && currentState != "MR") {
+            setAnswer("");
+        }
+        else {
+            toast.error("Already saved and recorded")
         }
     }
 
@@ -76,10 +95,17 @@ export default function page() {
             let temp = await questionFetcher(navMenu[i], "6676a99b91436f80e4dd9821", responses)
             data = [...data, ...temp];
         }
-        console.log(data)
         dispatch(setQuestionsState(data))
         setLoading(false)
     }
+
+    useEffect(() => {
+        function BeforeUnloadHandler(event: BeforeUnloadEvent) {
+            event.preventDefault();
+            return (event.returnValue = "")
+        }
+        window.addEventListener('beforeunload', BeforeUnloadHandler, { capture: true })
+    }, [])
 
     useEffect(() => {
         getQuestions()
@@ -107,21 +133,23 @@ export default function page() {
             </div>
             <div className='w-[94%] mt-8 m-auto flex justify-between items-center'>
                 <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10'>
-                    <h1 className='text-3xl font-bold py-6'>Question-{activeQuestionNumber}</h1>
+                    <h1 className='text-3xl font-bold py-6'>Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}</h1>
                     <hr />
                     <h1 className='font-semibold text-xl py-2'>{allQuestions[activeQuestionNumber - 1]?.question}</h1>
                     {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
                         <div key={id} className='my-4 cursor-pointer' >
-                            <input type="radio" checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc} onChange={() => {
-                                setAnswer(i.desc)
-                            }} name={`opt${activeQuestionNumber}${i.id}`} id={`opt${activeQuestionNumber}${i.id}`} />
+                            <input type="radio" checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
+                                onChange={() => {
+                                    setAnswer(i.desc)
+                                }} name={`opt${activeQuestionNumber}${i.id}`} id={`opt${activeQuestionNumber}${i.id}`} />
                             <label className='ml-2 text-[17px] font-medium cursor-pointer' htmlFor={`opt${activeQuestionNumber}${i.id}`}>{i.desc}</label>
                         </div>
                     ))}
                     <div className='mt-[19vh]'>
                         <button className='bg-yellow-500 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("MR")}>Mark for Review & Next</button>
                         <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("A")}>Save & Next</button>
-                        <button className='bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => changeState("NA", 0)}>Skip</button>
+                        <button className='bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("NA")}>Skip</button>
+                        <button className='bg-white outline outline-1 outline-black mx-2 rounded-xl px-4 py-[10px] text-sm text-black font-medium' onClick={clearResponseHandler}>Clear Response</button>
                     </div>
                 </div>
                 <div className='w-[25%] h-[72vh] bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 flex flex-col justify-center items-center'>
@@ -131,11 +159,11 @@ export default function page() {
                     <div className='flex w-[90%] justify-around flex-wrap mt-2 h-[44vh] overflow-y-scroll'>
                         {allQuestions.map((element, id) => {
                             return (
-                                <>
-                                    {Math.floor(element.quesId / 100) - 1 == activeMenu && <div key={id} onClick={() => setAnswer("")}>
-                                        <QuesNoCard id={id} state={id == 0 ? "V" : "UV"} />
+                                <div key={id}>
+                                    {Math.floor(element.quesId / 100) - 1 == activeMenu && <div onClick={() => setAnswer("")}>
+                                        <QuesNoCard display={element.quesId} id={id} state={id == 0 ? "V" : "UV"} />
                                     </div>}
-                                </>
+                                </div>
                             )
                         })}
                     </div>
