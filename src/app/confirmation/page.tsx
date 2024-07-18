@@ -108,8 +108,12 @@ export default function page() {
                             </div>
                         ))}
                     </div>
-                    <div className='w-[51.5%] h-[80vh] bg-[#ffffff44] backdrop-blur-[6px] rounded-md z-10'>
+                    <div className='w-[51.5%] h-[80vh] bg-[#ffffff44] backdrop-blur-[6px] rounded-md z-10 relative'>
                         <BarChartQuestions array={arr} />
+                        <div className='absolute flex flex-col justify-center items-center right-8 top-0'>
+                            <h1 className='font-bold text-4xl'>{arr[0] + arr[1] + arr[2] + arr[3]}</h1>
+                            <h1 className='font-semibold'>Total Questions</h1>
+                        </div>
                         <div className="m-auto mt-16 flex flex-col items-center justify-center ">
                             <h1 className='text-2xl w-[80%] text-center font-bold'>Are you sure you want to submit your exam ?</h1>
                             <div className='flex justify-evenly w-full mt-6'>
