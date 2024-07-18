@@ -11,6 +11,7 @@ import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
 import { responseFetcher } from '@/constants/responseFetcher';
 import { responseSetter } from '@/constants/responseSetter';
+import { useRouter } from 'next/navigation';
 
 interface option {
     desc: string,
@@ -31,6 +32,7 @@ interface questionType {
 export default function page() {
     const [questions, setQuestions] = useState<questionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const router = useRouter()
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java']);
     const [activeMenu, setActiveMenu] = useState<number>(0)
     const [subject, setSubject] = useState<string>("HTML")
@@ -158,19 +160,18 @@ export default function page() {
                     </div>
                     <div className='flex w-[90%] justify-around flex-wrap mt-2 h-[44vh] overflow-y-scroll'>
                         {allQuestions.map((element, id) => {
-                            return (
-                                <div key={id}>
-                                    {Math.floor(element.quesId / 100) - 1 == activeMenu && <div onClick={() => setAnswer("")}>
+                            if (Math.floor(element.quesId / 100) - 1 == activeMenu)
+                                return (
+                                    <div key={id} onClick={() => setAnswer("")}>
                                         <QuesNoCard display={element.quesId} id={id} state={id == 0 ? "V" : "UV"} />
-                                    </div>}
-                                </div>
-                            )
+                                    </div>
+                                )
                         })}
                     </div>
-                    <button className='bg-[#546CFF] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium'>Submit</button>
+                    <button className='bg-[#546CFF] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => router.push('/confirmation')}>Submit</button>
                 </div>
             </div>
-            <Image src="./icons/bg_logo.svg" alt="bgLogo" width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
+            <Image src="./icons/bg_logo.svg" alt="bgLogo" priority width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
         </div>}</div>
     )
 }
