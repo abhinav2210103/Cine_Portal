@@ -103,7 +103,7 @@ const LoginComponent = () => {
 
           <div className="flex items-center justify-center mt-[13vh]">
             <div
-              className="relative flex flex-col justify-between items-center gap-5 p-16 rounded-2xl bg-cover bg-center h-[60vh] w-[27rem]"
+              className="relative flex flex-col justify-between items-center gap-5 p-16 rounded-2xl bg-cover bg-center h-max-[65vh] w-[27rem]"
               style={{ backgroundImage: 'url("./inputbg.svg")' }}
             >
               <div>
@@ -125,7 +125,7 @@ const LoginComponent = () => {
                       id="studentNumber"
                       type="number"
                       name="studentNumber"
-                      placeholder="Enter Your Student No"
+                      placeholder=""
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.studentNumber}
@@ -148,7 +148,7 @@ const LoginComponent = () => {
                       id="password"
                       type={passwordVisible ? "text" : "password"}
                       name="password"
-                      placeholder="Enter Password"
+                      placeholder=""
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.password}
