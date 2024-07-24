@@ -1,13 +1,21 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import FeedbackSlider from '@/components/FeedbackSlider';
 
 export default function Page() {
+  const [userId, setUserId] = useState('');
   const [suggestion, setSuggestion] = useState('');
   const [error, setError] = useState('');
   const [slider1, setSlider1] = useState('1');
   const [slider2, setSlider2] = useState('1');
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') { 
+      const storedUserId = localStorage.getItem('userId') || '6676a99b91436f80e4dd9821';
+      setUserId(storedUserId);
+    }
+  }, []);
 
   const handleSlider1Change = (value: number) => {
     setSlider1(value.toString());
@@ -23,7 +31,7 @@ export default function Page() {
     } else {
       setError('');
       const feedbackData = {
-        userId: '6676a99b91436f80e4dd9821',
+        userId,
         response: [
           {
             question: 'How was the level of questions in the exam?',
@@ -50,7 +58,7 @@ export default function Page() {
         });
 
         if (!response.ok) {
-          throw new Error('netwrok error');
+          throw new Error('Network error');
         }
 
         const data = await response.json();

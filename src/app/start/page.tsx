@@ -9,6 +9,7 @@ import toast, { Toaster } from 'react-hot-toast';
 import Loader from '@/components/Loader/Loader';
 import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
+import Timer from '@/components/Timer';
 
 interface option {
     desc: string,
@@ -85,9 +86,7 @@ export default function page() {
                     <Image src="./icons/csi_logo.svg" width={50} height={50} alt="csiLogo" className='px-3 w-[50px]' />
                     <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                 </div>
-                <span className='text-lg'>
-                    Time Left : <span>03:00:00 hr</span>
-                </span>
+                <Timer/>
             </div>
             <div className='flex ml-[50%] -translate-x-[50%]'>
                 {navMenu?.map((element, id) => (
