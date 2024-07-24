@@ -8,6 +8,8 @@ import { useFormik } from "formik";
 import validationSchema from "@/app/constants/validationSchema";
 import ClipLoader from "react-spinners/ClipLoader";
 import { useRouter } from "next/router";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
@@ -18,6 +20,7 @@ export default function Login(): React.ReactElement {
       scriptProps={{ async: true }}
     >
       <LoginComponent />
+      <ToastContainer/>
     </GoogleReCaptchaProvider>
   );
 }
@@ -71,14 +74,22 @@ const LoginComponent = () => {
           }
         );
         if (!response.ok) {
+          if (response.status === 400) {
+            toast.error("Invalid credentials. Please try again.");
+          } else {
+            toast.error("An unexpected error occurred. Please try again later.");
+          }
+          
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
         localStorage.setItem('userId', data.userId);
         resetForm();
+        toast.success("Login successful! Redirecting...");
         router.push("/instructions");
       } catch (error) {
         console.error("Login failed:", error);
+        toast.error("Login failed");
       } finally {
         setDisabled(false); 
       }
