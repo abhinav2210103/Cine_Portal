@@ -10,6 +10,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { useRouter } from "next/router";
 
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
+const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 export default function Login(): React.ReactElement {
   return (
     <GoogleReCaptchaProvider
@@ -59,7 +60,7 @@ const LoginComponent = () => {
         }
         const token = await executeRecaptcha("Login");
         const response = await fetch(
-          "https://cine-student.onrender.com/student/login",
+          `${baseurl}/student/login`,
           {
             method: "POST",
             headers: {
@@ -73,7 +74,6 @@ const LoginComponent = () => {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Login successful:", data);
         localStorage.setItem('userId', data.userId);
         resetForm();
         router.push("/instructions");
