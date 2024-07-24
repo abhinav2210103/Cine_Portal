@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Slider, styled } from '@mui/material';
 
-
 const imageMap: { [key: number]: string } = {
   1: '/emoji-1.svg', 
   2: '/emoji-2.svg',
@@ -9,16 +8,13 @@ const imageMap: { [key: number]: string } = {
   4: '/emoji-4.svg',
 };
 
-
 interface CustomSliderProps {
   sliderValue: number; 
 }
 
-
 interface FeedbackSliderProps {
   onSliderChange: (value: number) => void;
 }
-
 
 const CustomSlider = styled(Slider, {
   shouldForwardProp: (prop) => prop !== 'sliderValue' 
@@ -49,7 +45,7 @@ const FeedbackSlider: React.FC<FeedbackSliderProps> = ({ onSliderChange }) => {
   };
 
   return (
-    <div style={{ width: '30rem', margin: 'auto', marginTop: '2rem' }}>
+    <div className="w-72 mx-auto mt-8"> 
       <CustomSlider
         defaultValue={1}
         min={1}

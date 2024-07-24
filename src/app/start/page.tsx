@@ -121,7 +121,7 @@ export default function page() {
                     <Image src="./icons/csi_logo.svg" width={50} height={50} alt="csiLogo" className='px-3 w-[50px]' />
                     <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                 </div>
-                <Timer/>
+          
             </div>
             <div className='flex ml-[50%] -translate-x-[50%]'>
                 {navMenu?.map((element, id) => (

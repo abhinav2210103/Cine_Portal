@@ -3,13 +3,13 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import FeedbackSlider from '@/components/FeedbackSlider';
 
-export default function Page() {
-  const [userId, setUserId] = useState('');
-  const [suggestion, setSuggestion] = useState('');
-  const [error, setError] = useState('');
-  const [slider1, setSlider1] = useState('1');
-  const [slider2, setSlider2] = useState('1');
-
+export default function Page() { 
+const [userId, setUserId] = useState<string>('');
+const [suggestion, setSuggestion] = useState<string>('');
+const [error, setError] = useState<string>('');
+const [slider1, setSlider1] = useState<string>('1');
+const [slider2, setSlider2] = useState<string>('1');
+const baseurl=process.env.NEXT_PUBLIC_BACKEND_URL;
   useEffect(() => {
     if (typeof window !== 'undefined') { 
       const storedUserId = localStorage.getItem('userId') || '6676a99b91436f80e4dd9821';
@@ -49,14 +49,14 @@ export default function Page() {
       };
 
       try {
-        const response = await fetch('https://cine-student.onrender.com/student/submitFeedback', {
+        const response = await fetch(baseurl +"/student/submitFeedback", {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify(feedbackData),
+          
         });
-
         if (!response.ok) {
           throw new Error('Network error');
         }
@@ -65,6 +65,7 @@ export default function Page() {
         console.log('Submitted:', data);
       } catch (error) {
         console.error('Error submitting feedback:', error);
+        console.log(baseurl);
       }
     }
   };
