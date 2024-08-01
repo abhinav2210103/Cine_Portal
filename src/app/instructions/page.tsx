@@ -1,10 +1,11 @@
-// import React from 'react';
+// 'use client'
+// import React, { useState } from 'react';
 // import Image from 'next/image';
 // import StartButton from './components/StartButton';
 // import SelectLanguageDropdown from './components/SelectLanguageDropdown';
 
-
 // export default function Instruction() {
+//     const [selectedLanguage, setSelectedLanguage] = useState<string>('');
 
 //     const circleData = [
 //         { src: '/icons/redCircle.png', text: 'Not Answered' },
@@ -23,14 +24,6 @@
 //         "Plagiarism and cheating of any kind will not be tolerated.",
 //         "You are expected to complete the exam independently and according to the instructions provided.",
 //         "Any violation of academic integrity will result in disciplinary action."
-//     ];
-
-//     const languages = [
-//         { value: "", label: "" },
-//         { value: "c++", label: "C++" },
-//         { value: "c", label: "C" },
-//         { value: "py", label: "Python" },
-//         { value: "java", label: "Java" }
 //     ];
 
 //     return (
@@ -73,14 +66,12 @@
 //                         <div className='w-[40%] mt-7 pb-4'>
 //                             <div className='w-[96%] h-[100%] flex flex-col pl-8 rounded-lg' style={{ backgroundImage: "url('/icons/SelectLanguagebg.png')" }}>
 //                                 <span className='my-6 font-bold text-lg'>Select Language</span>
-                                
-//                                 <SelectLanguageDropdown />
-                                
+//                                 <SelectLanguageDropdown selectedLanguage={selectedLanguage} setSelectedLanguage={setSelectedLanguage} />
 //                             </div>
 //                         </div>
 
 //                         <div className='w-[100%] h-full flex flex-col rounded-lg mt-7 ml-3' style={{ backgroundImage: "url('/icons/Startbg.png')" }}>
-//                             <StartButton />
+//                             <StartButton selectedLanguage={selectedLanguage} />
 //                         </div>
 //                     </div>
 //                 </div>
@@ -89,15 +80,14 @@
 //     );
 // }
 
-'use client'
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
-import StartButton from './components/StartButton';
-import SelectLanguageDropdown from './components/SelectLanguageDropdown';
+import dynamic from 'next/dynamic';
+
+// Dynamically import client-side container
+const SelectLanguageContainer = dynamic(() => import('./components/SelectLanguageContainer'), { ssr: false });
 
 export default function Instruction() {
-    const [selectedLanguage, setSelectedLanguage] = useState<string>('');
-
     const circleData = [
         { src: '/icons/redCircle.png', text: 'Not Answered' },
         { src: '/icons/yellowCircle.png', text: 'Review' },
@@ -153,21 +143,9 @@ export default function Instruction() {
                         </div>
                     </div>
 
-                    <div className='flex justify-start'>
-                        <div className='w-[40%] mt-7 pb-4'>
-                            <div className='w-[96%] h-[100%] flex flex-col pl-8 rounded-lg' style={{ backgroundImage: "url('/icons/SelectLanguagebg.png')" }}>
-                                <span className='my-6 font-bold text-lg'>Select Language</span>
-                                <SelectLanguageDropdown selectedLanguage={selectedLanguage} setSelectedLanguage={setSelectedLanguage} />
-                            </div>
-                        </div>
-
-                        <div className='w-[100%] h-full flex flex-col rounded-lg mt-7 ml-3' style={{ backgroundImage: "url('/icons/Startbg.png')" }}>
-                            <StartButton selectedLanguage={selectedLanguage} />
-                        </div>
-                    </div>
+                    <SelectLanguageContainer />
                 </div>
             </div>
         </div>
     );
 }
-
