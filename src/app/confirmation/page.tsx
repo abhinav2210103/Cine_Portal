@@ -2,6 +2,7 @@
 
 import BarChartQuestions from '@/components/BarChartQuestions';
 import Loader from '@/components/Loader/Loader';
+import Timer from '@/components/Timer';
 import { questionFetcher } from '@/constants/questionFetcher';
 import { responseFetcher } from '@/constants/responseFetcher';
 import { setQuestionsState } from '@/store/questionStateSlice';
@@ -34,6 +35,7 @@ export default function page() {
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
     const router = useRouter()
+    const remainTime = localStorage.getItem('TREM')
     const [arr, setArr] = useState<number[]>([0, 0, 0, 0])
     const [sep, setSep] = useState<questionType[][]>([[], [], [], [], []])
     let menu = ['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'];
@@ -41,7 +43,11 @@ export default function page() {
     let colors = ["#6B7280", "#ECB701", "#00C289", "#FF122E"];
     useEffect(() => {
         async function getQuestion() {
-            let responses = await responseFetcher("6676a99b91436f80e4dd9821");
+            const userId = localStorage.getItem('userId')
+            if (userId == null) {
+                return;
+            }
+            let responses = await responseFetcher(userId);
             let data: questionType[] = [];
             for (let i = 0; i < ['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'].length; i++) {
                 let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'][i], "6676a99b91436f80e4dd9821", responses)
@@ -92,7 +98,7 @@ export default function page() {
                         <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                     </div>
                     <span className='text-lg'>
-                        Time Left : <span>03:00:00 hr</span>
+                        Time Left : <Timer remainTime={parseInt(remainTime || "")} />
                     </span>
                 </div>
                 <div className='w-[94%] mt-8 m-auto flex justify-between items-center'>

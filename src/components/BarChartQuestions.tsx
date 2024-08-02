@@ -9,10 +9,10 @@ export default function BarChartQuestions(props: props) {
     return (
         <div>
             <div className='w-[90%] m-auto flex justify-evenly items-end h-[300px] border-l-2 border-b-2 border-black'>
-                <div className={`w-[50px] font-bold text-white pt-2 rounded-t-lg min-h-[35px] bg-gray-500 flex justify-center`} style={{ height: `${(props.array[0] * 500) / total}px` }}>{props.array[0]}</div>
-                <div className={`w-[50px] font-bold text-white pt-2 rounded-t-lg min-h-[35px] bg-[#ECB701] flex justify-center`} style={{ height: `${(props.array[1] * 500) / total}px` }}>{props.array[1]}</div>
-                <div className={`w-[50px] font-bold text-white pt-2 rounded-t-lg min-h-[35px] bg-[#00C289] flex justify-center`} style={{ height: `${(props.array[2] * 500) / total}px` }}>{props.array[2]}</div>
-                <div className={`w-[50px] font-bold text-white pt-2 rounded-t-lg min-h-[35px] bg-[#FF122E] flex justify-center`} style={{ height: `${(props.array[3] * 500) / total}px` }}>{props.array[3]}</div>
+                <div className={`w-[50px] font-bold text-white pt-2 rounded-t-lg min-h-[35px] bg-gray-500 flex justify-center`} style={{ height: `${(props.array[0] * 300) / total}px` }}>{props.array[0]}</div>
+                <div className={`w-[50px] font-bold text-white pt-2 rounded-t-lg min-h-[35px] bg-[#ECB701] flex justify-center`} style={{ height: `${(props.array[1] * 300) / total}px` }}>{props.array[1]}</div>
+                <div className={`w-[50px] font-bold text-white pt-2 rounded-t-lg min-h-[35px] bg-[#00C289] flex justify-center`} style={{ height: `${(props.array[2] * 300) / total}px` }}>{props.array[2]}</div>
+                <div className={`w-[50px] font-bold text-white pt-2 rounded-t-lg min-h-[35px] bg-[#FF122E] flex justify-center`} style={{ height: `${(props.array[3] * 300) / total}px` }}>{props.array[3]}</div>
             </div>
             <div className='flex justify-evenly items-center w-full mt-5'>
                 <div className='flex items-center'>

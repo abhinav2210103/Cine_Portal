@@ -1,9 +1,14 @@
-import React from 'react';
+"use client"
+
+import React, { useEffect } from 'react';
 import Image from 'next/image';
 import StartButton from './components/StartButton';
 import SelectLanguageDropdown from './components/SelectLanguageDropdown';
+import { useRouter } from 'next/navigation';
 
 export default function Instruction() {
+
+    const router = useRouter()
 
     const circleData = [
         { src: '/icons/redCircle.png', text: 'Not Answered' },
@@ -32,6 +37,15 @@ export default function Instruction() {
         { value: "java", label: "Java" }
     ];
 
+    useEffect(() => {
+        if (localStorage.getItem("userId") == null) {
+            router.replace("/login")
+        }
+        if (localStorage.getItem("TREM") != undefined) {
+            router.replace("/start")
+        }
+    }, [])
+
     return (
         <div className='bg-[#EAEEFF] min-h-screen min-w-screen'>
             <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
@@ -46,7 +60,7 @@ export default function Instruction() {
                     <div className='p-5 mt-6 relative bg-cover bg-center' style={{ backgroundImage: "url('/icons/bg.png')" }}>
                         <h1 className='font-bold mb-4 text-2xl ml-3'>INSTRUCTIONS</h1>
                         <div className='flex'>
-                            <Image src='/icons/verticalLine.png' alt="Vertical Line" width={5} height={50}  />
+                            <Image src='/icons/verticalLine.png' alt="Vertical Line" width={5} height={50} />
                             <ul className='list-disc w-[90%] text-justify ml-7 font-medium text-lg'>
                                 {instructions.map((instruction, index) => (
                                     <li key={index} className='mb-3'>{instruction}</li>
@@ -68,13 +82,14 @@ export default function Instruction() {
                         </div>
                     </div>
 
+
                     <div className='flex justify-start'>
                         <div className='w-[40%] mt-7 pb-4'>
                             <div className='w-[96%] h-[100%] flex flex-col pl-8 rounded-lg' style={{ backgroundImage: "url('/icons/SelectLanguagebg.png')" }}>
                                 <span className='my-6 font-bold text-lg'>Select Language</span>
-                                
+
                                 <SelectLanguageDropdown />
-                                
+
                             </div>
                         </div>
 

@@ -29,6 +29,14 @@ const LoginComponent = () => {
   const router = useRouter();
 
   useEffect(() => {
+    const userId = localStorage.getItem("userId")
+    const trem = localStorage.getItem("TREM");
+    if (trem != undefined) {
+      localStorage.removeItem("TREM");
+    }
+    if (userId != undefined) {
+      router.replace("/start")
+    }
     const Backgroundimage = new Image();
     Backgroundimage.src = "./cine-bg.png";
     Backgroundimage.onload = () => {
@@ -75,12 +83,25 @@ const LoginComponent = () => {
         const data = await response.json();
         console.log("Login successful:", data);
         localStorage.setItem('userId', data.userId);
+        const timeResponse = await fetch("https://cine-student.onrender.com/student/timeRemaining?userId=" + data.userId, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        })
+        const timeData = await timeResponse.json()
+        console.log(timeData.remainingTime)
+        localStorage.setItem("TREM", timeData.remainingTime);
         resetForm();
-        router.push("/instructions");
+        if (timeData.remainingTime == "")
+          router.push("/instructions");
+        else
+          router.push("/start")
       } catch (error) {
         console.error("Login failed:", error);
       } finally {
-        setDisabled(false); 
+        setDisabled(false);
       }
     },
   });
