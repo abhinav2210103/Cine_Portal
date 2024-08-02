@@ -8,8 +8,11 @@ import { useFormik } from "formik";
 import validationSchema from "@/app/constants/validationSchema";
 import ClipLoader from "react-spinners/ClipLoader";
 import { useRouter } from "next/router";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
+const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
 export default function Login(): React.ReactElement {
   return (
     <GoogleReCaptchaProvider
@@ -17,6 +20,7 @@ export default function Login(): React.ReactElement {
       scriptProps={{ async: true }}
     >
       <LoginComponent />
+      <ToastContainer/>
     </GoogleReCaptchaProvider>
   );
 }
@@ -67,7 +71,7 @@ const LoginComponent = () => {
         }
         const token = await executeRecaptcha("Login");
         const response = await fetch(
-          "https://cine-student.onrender.com/student/login",
+          `${baseurl}/student/login`,
           {
             method: "POST",
             headers: {
@@ -78,10 +82,15 @@ const LoginComponent = () => {
           }
         );
         if (!response.ok) {
+          if (response.status === 400) {
+            toast.error("Invalid credentials. Please try again.");
+          } else {
+            toast.error("An unexpected error occurred. Please try again later.");
+          }
+          
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        console.log("Login successful:", data);
         localStorage.setItem('userId', data.userId);
         const timeResponse = await fetch("https://cine-student.onrender.com/student/timeRemaining?userId=" + data.userId, {
           method: "GET",
@@ -100,6 +109,7 @@ const LoginComponent = () => {
           router.push("/start")
       } catch (error) {
         console.error("Login failed:", error);
+        toast.error("Login failed");
       } finally {
         setDisabled(false);
       }
@@ -124,7 +134,7 @@ const LoginComponent = () => {
 
           <div className="flex items-center justify-center mt-[13vh]">
             <div
-              className="relative flex flex-col justify-between items-center gap-5 p-16 rounded-2xl bg-cover bg-center h-[60vh] w-[27rem]"
+              className="relative flex flex-col justify-between items-center gap-5 p-16 rounded-2xl bg-cover bg-center h-max-[65vh] w-[27rem]"
               style={{ backgroundImage: 'url("./inputbg.svg")' }}
             >
               <div>
@@ -146,7 +156,7 @@ const LoginComponent = () => {
                       id="studentNumber"
                       type="number"
                       name="studentNumber"
-                      placeholder="Enter Your Student No"
+                      placeholder=""
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.studentNumber}
@@ -169,7 +179,7 @@ const LoginComponent = () => {
                       id="password"
                       type={passwordVisible ? "text" : "password"}
                       name="password"
-                      placeholder="Enter Password"
+                      placeholder=""
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.password}
