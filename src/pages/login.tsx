@@ -20,7 +20,7 @@ export default function Login(): React.ReactElement {
       scriptProps={{ async: true }}
     >
       <LoginComponent />
-      <ToastContainer/>
+      <ToastContainer />
     </GoogleReCaptchaProvider>
   );
 }
@@ -89,7 +89,7 @@ const LoginComponent = () => {
           } else {
             toast.error("An unexpected error occurred. Please try again later.");
           }
-          
+
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
