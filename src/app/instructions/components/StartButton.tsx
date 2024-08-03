@@ -35,6 +35,8 @@ export default function StartButton() {
             <button
                 disabled={!(start === "START" && isChecked)}
                 onClick={() => {
+                    if (typeof window == undefined)
+                        return
                     localStorage.setItem("TREM", "10800000")
                     router.replace("/start")
                 }}

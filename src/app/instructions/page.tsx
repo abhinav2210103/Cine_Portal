@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useEffect } from 'react';
 import Image from 'next/image';
@@ -38,6 +38,8 @@ export default function Instruction() {
     ];
 
     useEffect(() => {
+        if (typeof window == undefined)
+            return
         if (localStorage.getItem("userId") == null) {
             router.replace("/login")
         }

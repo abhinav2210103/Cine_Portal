@@ -64,6 +64,8 @@ export default function page() {
             toast.error("Already saved and recorded")
             return
         }
+        if (typeof window == undefined)
+            return
         const userId = localStorage.getItem("userId");
         if (userId == null)
             return;
@@ -96,6 +98,8 @@ export default function page() {
     }
 
     const getQuestions = async () => {
+        if (typeof window == undefined)
+            return
         const userId = localStorage.getItem("userId");
         if (userId == null) {
             toast.error("User not found")
@@ -126,6 +130,8 @@ export default function page() {
     }, [])
 
     useEffect(() => {
+        if (typeof window == undefined)
+            return
         if (localStorage.getItem("userId") == null) {
             router.replace("/login")
         }

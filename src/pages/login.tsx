@@ -29,6 +29,8 @@ const LoginComponent = () => {
   const router = useRouter();
 
   useEffect(() => {
+    if (typeof window == undefined)
+      return
     const userId = localStorage.getItem("userId")
     const trem = localStorage.getItem("TREM");
     if (trem != undefined) {

@@ -1,4 +1,4 @@
-"use client"
+'use client';
 
 import BarChartQuestions from '@/components/BarChartQuestions';
 import Loader from '@/components/Loader/Loader';
@@ -29,20 +29,24 @@ interface questionType {
     answer: number
 }
 
-export default function page() {
+export default function Confirmation() {
 
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
     const router = useRouter()
-    const remainTime = localStorage.getItem('TREM')
+    let remainTime;
     const [arr, setArr] = useState<number[]>([0, 0, 0, 0])
     const [sep, setSep] = useState<questionType[][]>([[], [], [], [], []])
     let menu = ['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'];
     let states = ["UA", "MR", "A", "NA"];
     let colors = ["#6B7280", "#ECB701", "#00C289", "#FF122E"];
     useEffect(() => {
+        if (typeof window != undefined)
+            remainTime = localStorage.getItem('TREM');
         async function getQuestion() {
+            if (typeof window == undefined)
+                return;
             const userId = localStorage.getItem('userId')
             if (userId == null) {
                 return;
@@ -50,7 +54,7 @@ export default function page() {
             let responses = await responseFetcher(userId);
             let data: questionType[] = [];
             for (let i = 0; i < ['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'].length; i++) {
-                let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'][i], "6676a99b91436f80e4dd9821", responses)
+                let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'][i], userId, responses)
                 data = [...data, ...temp];
             }
             dispatch(setQuestionsState(data))
