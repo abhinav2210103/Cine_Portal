@@ -89,7 +89,7 @@ const LoginComponent = () => {
         router.push("/instructions");
       } catch (error) {
         console.error("Login failed:", error);
-        toast.error("Login failed");
+        toast.error("Login failed")
       } finally {
         setDisabled(false); 
       }
