@@ -53,8 +53,8 @@ export default function Confirmation() {
             }
             let responses = await responseFetcher(userId);
             let data: questionType[] = [];
-            for (let i = 0; i < ['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'].length; i++) {
-                let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'][i], userId, responses)
+            for (let i = 0; i < ['HTML', 'SQL', 'CSS', 'Aptitude', localStorage.getItem("language")].length; i++) {
+                let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', localStorage.getItem("language") || ""], ['HTML', 'SQL', 'CSS', 'Aptitude', localStorage.getItem("language") || ""][i], userId, responses)
                 data = [...data, ...temp];
             }
             dispatch(setQuestionsState(data))

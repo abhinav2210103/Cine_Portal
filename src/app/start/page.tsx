@@ -109,6 +109,7 @@ export default function page() {
         }
         let language = await languageFetcher(userId);
         setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language])
+        localStorage.setItem("language", language);
         let responses = await responseFetcher(userId);
         console.log(responses)
         if (responses?.message) {
