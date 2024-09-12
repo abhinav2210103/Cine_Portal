@@ -8,9 +8,9 @@ interface responseType {
 }
 
 const responseIds = ["NA", "MR", "A"];
-const subjects = ["HTML", "SQL", "CSS", "Aptitude", "Java"];
 
 async function questionFetcher(
+    subjects: string[],
     subject: string,
     userId: string,
     responses: responseType[]
@@ -24,23 +24,32 @@ async function questionFetcher(
         const idx = subjects.indexOf(subject);
         const data = await res.json();
         for (let index = 0; index < data.length; index++) {
-            for (let i = 0; i < responses.length; i++) {
-                if (responses[i].quesId == data[index]._id) {
-                    data[index] = {
-                        ...data[index],
-                        quesId: 100 * (idx + 1) + index + 1,
-                        state: responseIds[responses[i].status],
-                        recordedAns: responses[i].ansId,
-                    };
-                    break;
-                } else {
-                    data[index] = {
-                        ...data[index],
-                        quesId: 100 * (idx + 1) + index + 1,
-                        state: "UA",
-                        recordedAns: 0,
-                    };
+            if (responses.length > 0) {
+                for (let i = 0; i < responses.length; i++) {
+                    if (responses[i]?.quesId == data[index]._id) {
+                        data[index] = {
+                            ...data[index],
+                            quesId: 100 * (idx + 1) + index + 1,
+                            state: responseIds[responses[i].status],
+                            recordedAns: responses[i].ansId,
+                        };
+                        break;
+                    } else {
+                        data[index] = {
+                            ...data[index],
+                            quesId: 100 * (idx + 1) + index + 1,
+                            state: "UA",
+                            recordedAns: 0,
+                        };
+                    }
                 }
+            } else {
+                data[index] = {
+                    ...data[index],
+                    quesId: 100 * (idx + 1) + index + 1,
+                    state: "UA",
+                    recordedAns: 0,
+                };
             }
         }
         return data;

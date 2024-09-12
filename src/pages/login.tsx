@@ -37,9 +37,6 @@ const LoginComponent = () => {
       return
     const userId = localStorage.getItem("userId")
     const trem = localStorage.getItem("TREM");
-    if (trem != undefined) {
-      localStorage.removeItem("TREM");
-    }
     if (userId != undefined) {
       router.replace("/start")
     }
@@ -94,7 +91,7 @@ const LoginComponent = () => {
         }
         const data = await response.json();
         localStorage.setItem('userId', data.userId);
-        const timeResponse = await fetch("https://cine-student.onrender.com/student/timeRemaining?userId=" + data.userId, {
+        const timeResponse = await fetch(`${baseurl}/student/timeRemaining?userId=${data.userId}`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
@@ -105,7 +102,7 @@ const LoginComponent = () => {
         console.log(timeData.remainingTime)
         localStorage.setItem("TREM", timeData.remainingTime);
         resetForm();
-        if (timeData.remainingTime == "")
+        if (timeData.remainingTime == "10800000")
           router.push("/instructions");
         else
           router.push("/start")

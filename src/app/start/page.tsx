@@ -11,8 +11,9 @@ import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
 import { responseFetcher } from '@/constants/responseFetcher';
 import { responseSetter } from '@/constants/responseSetter';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
 import Timer from '@/components/Timer';
+import { languageFetcher } from '@/constants/languageFetcher';
 
 interface option {
     desc: string,
@@ -31,6 +32,7 @@ interface questionType {
 }
 
 export default function page() {
+    const query = useParams()
     const [questions, setQuestions] = useState<questionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [remainTime, setRemainTime] = useState<number>(0)
@@ -69,15 +71,14 @@ export default function page() {
         const userId = localStorage.getItem("userId");
         if (userId == null)
             return;
-        allQuestions[activeQuestionNumber - 1].options.forEach(async option => {
+        for (const option of allQuestions[activeQuestionNumber - 1].options) {
             if (option.desc == answer) {
                 ansId = option.id
                 await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
                 changeState(state, state == "NA" ? 0 : ansId)
                 setAnswer("")
-                return
             }
-        })
+        }
         if (ansId == 0 && state != "NA") {
             toast.error("Please select an answer")
             return
@@ -106,6 +107,8 @@ export default function page() {
             router.replace("/login")
             return
         }
+        let language = await languageFetcher(userId);
+        setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language])
         let responses = await responseFetcher(userId);
         console.log(responses)
         if (responses?.message) {
@@ -114,7 +117,7 @@ export default function page() {
         }
         let data: questionType[] = [];
         for (let i = 0; i < navMenu.length; i++) {
-            let temp = await questionFetcher(navMenu[i], userId, responses)
+            let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language], ['HTML', 'SQL', 'CSS', 'Aptitude', language][i], userId, responses)
             data = [...data, ...temp];
         }
         dispatch(setQuestionsState(data))
@@ -130,6 +133,7 @@ export default function page() {
     }, [])
 
     useEffect(() => {
+        console.log(query)
         if (typeof window == undefined)
             return
         if (localStorage.getItem("userId") == null) {
