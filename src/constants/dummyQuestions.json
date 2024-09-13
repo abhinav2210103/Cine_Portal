@@ -1,0 +1,352 @@
+[
+    {
+        "state": "UA",
+        "quesId": 1,
+        "subject": "HTML",
+        "question": "What does HTML stand for?",
+        "options": [
+            { "desc": "Hyper Text Markup Language", "id": 1 },
+            { "desc": "Home Tool Markup Language", "id": 2 },
+            { "desc": "Hyperlinks and Text Markup Language", "id": 3 },
+            { "desc": "Hyperlinking Text Marking Language", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 2,
+        "subject": "HTML",
+        "question": "Who is making the Web standards?",
+        "options": [
+            { "desc": "Google", "id": 1 },
+            { "desc": "Microsoft", "id": 2 },
+            { "desc": "Mozilla", "id": 3 },
+            { "desc": "The World Wide Web Consortium", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 4
+    },
+    {
+        "state": "UA",
+        "quesId": 3,
+        "subject": "HTML",
+        "question": "Choose the correct HTML element for the largest heading:",
+        "options": [
+            { "desc": "<h6>", "id": 1 },
+            { "desc": "<head>", "id": 2 },
+            { "desc": "<h1>", "id": 3 },
+            { "desc": "<heading>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 3
+    },
+    {
+        "state": "UA",
+        "quesId": 4,
+        "subject": "HTML",
+        "question": "What is the correct HTML element for inserting a line break?",
+        "options": [
+            { "desc": "<break>", "id": 1 },
+            { "desc": "<lb>", "id": 2 },
+            { "desc": "<br>", "id": 3 },
+            { "desc": "<b>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 3
+    },
+    {
+        "state": "UA",
+        "quesId": 5,
+        "subject": "HTML",
+        "question": "What is the correct HTML for adding a background color?",
+        "options": [
+            { "desc": "<body style=\"background-color:yellow;\">", "id": 1 },
+            { "desc": "<background>yellow</background>", "id": 2 },
+            { "desc": "<body bg=\"yellow\">", "id": 3 },
+            { "desc": "<body bgcolor=\"yellow\">", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 6,
+        "subject": "HTML",
+        "question": "Choose the correct HTML element to define important text",
+        "options": [
+            { "desc": "<strong>", "id": 1 },
+            { "desc": "<b>", "id": 2 },
+            { "desc": "<important>", "id": 3 },
+            { "desc": "<i>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 7,
+        "subject": "HTML",
+        "question": "Which HTML element defines the title of a document?",
+        "options": [
+            { "desc": "<meta>", "id": 1 },
+            { "desc": "<title>", "id": 2 },
+            { "desc": "<head>", "id": 3 },
+            { "desc": "<header>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 2
+    },
+    {
+        "state": "UA",
+        "quesId": 8,
+        "subject": "HTML",
+        "question": "Which HTML attribute specifies an alternate text for an image, if the image cannot be displayed?",
+        "options": [
+            { "desc": "title", "id": 1 },
+            { "desc": "src", "id": 2 },
+            { "desc": "alt", "id": 3 },
+            { "desc": "longdesc", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 3
+    },
+    {
+        "state": "UA",
+        "quesId": 9,
+        "subject": "HTML",
+        "question": "What is the correct HTML for creating a hyperlink?",
+        "options": [
+            { "desc": "<a>http://www.google.com</a>", "id": 1 },
+            { "desc": "<a href=\"http://www.google.com\">Google</a>", "id": 2 },
+            { "desc": "<a url=\"http://www.google.com\">Google</a>", "id": 3 },
+            { "desc": "<a name=\"http://www.google.com\">Google</a>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 2
+    },
+    {
+        "state": "UA",
+        "quesId": 10,
+        "subject": "HTML",
+        "question": "Which character is used to indicate an end tag?",
+        "options": [
+            { "desc": "*", "id": 1 },
+            { "desc": "/", "id": 2 },
+            { "desc": "<", "id": 3 },
+            { "desc": "^", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 2
+    },
+    {
+        "state": "UA",
+        "quesId": 11,
+        "subject": "HTML",
+        "question": "How can you make a numbered list?",
+        "options": [
+            { "desc": "<ul>", "id": 1 },
+            { "desc": "<ol>", "id": 2 },
+            { "desc": "<list>", "id": 3 },
+            { "desc": "<dl>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 2
+    },
+    {
+        "state": "UA",
+        "quesId": 12,
+        "subject": "HTML",
+        "question": "How can you make a bulleted list?",
+        "options": [
+            { "desc": "<ul>", "id": 1 },
+            { "desc": "<ol>", "id": 2 },
+            { "desc": "<list>", "id": 3 },
+            { "desc": "<dl>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 13,
+        "subject": "HTML",
+        "question": "What is the correct HTML for making a checkbox?",
+        "options": [
+            { "desc": "<input type=\"check\">", "id": 1 },
+            { "desc": "<check>", "id": 2 },
+            { "desc": "<input type=\"checkbox\">", "id": 3 },
+            { "desc": "<checkbox>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 3
+    },
+    {
+        "state": "UA",
+        "quesId": 14,
+        "subject": "HTML",
+        "question": "What is the correct HTML for making a text input field?",
+        "options": [
+            { "desc": "<input type=\"textfield\">", "id": 1 },
+            { "desc": "<input type=\"text\">", "id": 2 },
+            { "desc": "<textfield>", "id": 3 },
+            { "desc": "<textinput>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 2
+    },
+    {
+        "state": "UA",
+        "quesId": 15,
+        "subject": "HTML",
+        "question": "Which HTML element is used to define a table?",
+        "options": [
+            { "desc": "<table>", "id": 1 },
+            { "desc": "<tbl>", "id": 2 },
+            { "desc": "<tab>", "id": 3 },
+            { "desc": "<t>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 16,
+        "subject": "HTML",
+        "question": "What is the correct HTML for inserting an image?",
+        "options": [
+            { "desc": "<img src=\"image.gif\" alt=\"MyImage\">", "id": 1 },
+            { "desc": "<img alt=\"MyImage\">image.gif</img>", "id": 2 },
+            { "desc": "<image src=\"image.gif\" alt=\"MyImage\">", "id": 3 },
+            { "desc": "<img href=\"image.gif\" alt=\"MyImage\">", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 17,
+        "subject": "HTML",
+        "question": "What is the correct HTML for inserting a background image?",
+        "options": [
+            { "desc": "<body background=\"background.gif\">", "id": 1 },
+            { "desc": "<background img=\"background.gif\">", "id": 2 },
+            { "desc": "<img background=\"background.gif\">", "id": 3 },
+            { "desc": "<body bg=\"background.gif\">", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 18,
+        "subject": "HTML",
+        "question": "What is the correct HTML element to define emphasized text?",
+        "options": [
+            { "desc": "<em>", "id": 1 },
+            { "desc": "<italic>", "id": 2 },
+            { "desc": "<i>", "id": 3 },
+            { "desc": "<strong>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 19,
+        "subject": "HTML",
+        "question": "Which HTML element is used to specify a footer for a document or section?",
+        "options": [
+            { "desc": "<footer>", "id": 1 },
+            { "desc": "<bottom>", "id": 2 },
+            { "desc": "<section>", "id": 3 },
+            { "desc": "<foot>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 20,
+        "subject": "HTML",
+        "question": "Which HTML element is used to specify a navigation link?",
+        "options": [
+            { "desc": "<nav>", "id": 1 },
+            { "desc": "<navigate>", "id": 2 },
+            { "desc": "<navigation>", "id": 3 },
+            { "desc": "<link>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 21,
+        "subject": "HTML",
+        "question": "Which HTML element is used to define an unordered list?",
+        "options": [
+            { "desc": "<ul>", "id": 1 },
+            { "desc": "<ol>", "id": 2 },
+            { "desc": "<list>", "id": 3 },
+            { "desc": "<ulist>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 22,
+        "subject": "HTML",
+        "question": "What is the correct HTML for making a drop-down list?",
+        "options": [
+            { "desc": "<input type=\"dropdown\">", "id": 1 },
+            { "desc": "<select>", "id": 2 },
+            { "desc": "<list>", "id": 3 },
+            { "desc": "<dropdown>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 2
+    },
+    {
+        "state": "UA",
+        "quesId": 23,
+        "subject": "HTML",
+        "question": "Which HTML element is used to define a list item?",
+        "options": [
+            { "desc": "<li>", "id": 1 },
+            { "desc": "<item>", "id": 2 },
+            { "desc": "<list>", "id": 3 },
+            { "desc": "<ul>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 24,
+        "subject": "HTML",
+        "question": "What is the correct HTML for inserting a comment?",
+        "options": [
+            { "desc": "<!-- This is a comment -->", "id": 1 },
+            { "desc": "<comment> This is a comment </comment>", "id": 2 },
+            { "desc": "<!-- This is a comment -->", "id": 3 },
+            { "desc": "<com> This is a comment </com>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    },
+    {
+        "state": "UA",
+        "quesId": 25,
+        "subject": "HTML",
+        "question": "Which HTML element is used to specify a header for a document or section?",
+        "options": [
+            { "desc": "<header>", "id": 1 },
+            { "desc": "<head>", "id": 2 },
+            { "desc": "<section>", "id": 3 },
+            { "desc": "<top>", "id": 4 }
+        ],
+        "recordedAns": 0,
+        "answer": 1
+    }
+]
