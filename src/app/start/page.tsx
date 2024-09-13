@@ -11,7 +11,9 @@ import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
 import { responseFetcher } from '@/constants/responseFetcher';
 import { responseSetter } from '@/constants/responseSetter';
-import { useRouter } from 'next/navigation';
+import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import Timer from '@/components/Timer';
+import { languageFetcher } from '@/constants/languageFetcher';
 
 interface option {
     desc: string,
@@ -30,8 +32,12 @@ interface questionType {
 }
 
 export default function page() {
+    const query = useParams()
+    if (typeof window == undefined)
+        return;
     const [questions, setQuestions] = useState<questionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [remainTime, setRemainTime] = useState<number>(0)
     const router = useRouter()
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java']);
     const [activeMenu, setActiveMenu] = useState<number>(0)
@@ -62,21 +68,25 @@ export default function page() {
             toast.error("Already saved and recorded")
             return
         }
-        allQuestions[activeQuestionNumber - 1].options.forEach(async option => {
+        if (typeof window == undefined)
+            return
+        const userId = localStorage.getItem("userId");
+        if (userId == null)
+            return;
+        for (const option of allQuestions[activeQuestionNumber - 1].options) {
             if (option.desc == answer) {
                 ansId = option.id
-                await responseSetter("6676a99b91436f80e4dd9821", allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
                 changeState(state, state == "NA" ? 0 : ansId)
+                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
                 setAnswer("")
-                return
             }
-        })
+        }
         if (ansId == 0 && state != "NA") {
             toast.error("Please select an answer")
             return
         }
-        await responseSetter("6676a99b91436f80e4dd9821", allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
         changeState(state, state == "NA" ? 0 : ansId)
+        await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
     }
 
 
@@ -91,10 +101,28 @@ export default function page() {
     }
 
     const getQuestions = async () => {
-        let responses = await responseFetcher("6676a99b91436f80e4dd9821");
+        if (typeof window == undefined)
+            return
+        const userId = localStorage.getItem("userId")
+        if (userId == null) {
+            toast.error("User not found")
+            router.replace("/login")
+            return
+        }
+        let language = await languageFetcher(userId);
+        setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language])
+        if (typeof window == undefined)
+            return;
+        localStorage.setItem("language", language);
+        let responses = await responseFetcher(userId);
+        console.log(responses)
+        if (responses?.message) {
+            router.replace("/login")
+            return
+        }
         let data: questionType[] = [];
         for (let i = 0; i < navMenu.length; i++) {
-            let temp = await questionFetcher(navMenu[i], "6676a99b91436f80e4dd9821", responses)
+            let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language], ['HTML', 'SQL', 'CSS', 'Aptitude', language][i], userId, responses)
             data = [...data, ...temp];
         }
         dispatch(setQuestionsState(data))
@@ -110,6 +138,16 @@ export default function page() {
     }, [])
 
     useEffect(() => {
+        console.log(query)
+        if (typeof window == undefined)
+            return
+        if (localStorage.getItem("userId") == null) {
+            router.replace("/login")
+        }
+        if (localStorage.getItem("TREM") != null) {
+            let data: number = parseInt(localStorage.getItem("TREM") || "0")
+            setRemainTime(data)
+        }
         getQuestions()
     }, [])
 
@@ -122,7 +160,7 @@ export default function page() {
                     <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                 </div>
                 <span className='text-lg'>
-                    Time Left : <span>03:00:00 hr</span>
+                    Time Left : <Timer remainTime={remainTime} />
                 </span>
             </div>
             <div className='flex ml-[50%] -translate-x-[50%]'>
@@ -175,6 +213,5 @@ export default function page() {
         </div>}</div>
     )
 }
-
 
 
