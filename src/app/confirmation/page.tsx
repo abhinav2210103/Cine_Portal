@@ -1,7 +1,8 @@
-"use client"
+'use client';
 
 import BarChartQuestions from '@/components/BarChartQuestions';
 import Loader from '@/components/Loader/Loader';
+import Timer from '@/components/Timer';
 import { questionFetcher } from '@/constants/questionFetcher';
 import { responseFetcher } from '@/constants/responseFetcher';
 import { setQuestionsState } from '@/store/questionStateSlice';
@@ -28,23 +29,37 @@ interface questionType {
     answer: number
 }
 
-export default function page() {
+export default function Confirmation() {
 
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const dispatch = useDispatch()
     const [loading, setLoading] = useState<boolean>(false)
     const router = useRouter()
+    let remainTime;
     const [arr, setArr] = useState<number[]>([0, 0, 0, 0])
     const [sep, setSep] = useState<questionType[][]>([[], [], [], [], []])
-    let menu = ['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'];
+    const [menu, setMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', "Java"]);
     let states = ["UA", "MR", "A", "NA"];
     let colors = ["#6B7280", "#ECB701", "#00C289", "#FF122E"];
     useEffect(() => {
+        if (typeof window != undefined)
+            remainTime = localStorage.getItem('TREM');
         async function getQuestion() {
-            let responses = await responseFetcher("6676a99b91436f80e4dd9821");
+            if (typeof window == undefined)
+                return;
+            const userId = localStorage.getItem('userId')
+            if (userId == null) {
+                return;
+            }
+            let responses = await responseFetcher(userId);
             let data: questionType[] = [];
-            for (let i = 0; i < ['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'].length; i++) {
-                let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'][i], "6676a99b91436f80e4dd9821", responses)
+            let language;
+            if (typeof window == undefined)
+                return;
+            language = localStorage.getItem('language');
+            setMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language || ""]);
+            for (let i = 0; i < ['HTML', 'SQL', 'CSS', 'Aptitude', language].length; i++) {
+                let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language || ""], ['HTML', 'SQL', 'CSS', 'Aptitude', language || ""][i], userId, responses)
                 data = [...data, ...temp];
             }
             dispatch(setQuestionsState(data))
@@ -92,7 +107,7 @@ export default function page() {
                         <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
                     </div>
                     <span className='text-lg'>
-                        Time Left : <span>03:00:00 hr</span>
+                        Time Left : <Timer remainTime={parseInt(remainTime || "")} />
                     </span>
                 </div>
                 <div className='w-[94%] mt-8 m-auto flex justify-between items-center'>
@@ -118,7 +133,7 @@ export default function page() {
                             <h1 className='text-2xl w-[80%] text-center font-bold'>Are you sure you want to submit your exam ?</h1>
                             <div className='flex justify-evenly w-full mt-6'>
                                 <button onClick={() => router.push("/start")} className='bg-[#B795E2] text-white font-bold py-2 px-10 rounded-xl'>Back to Test</button>
-                                <button className='bg-[#546CFF] text-white font-bold py-2 px-10 rounded-xl'>Submit Test</button>
+                                <button onClick={() => router.push("/feedback")} className='bg-[#546CFF] text-white font-bold py-2 px-10 rounded-xl'>Submit Test</button>
                             </div>
                         </div>
                     </div>

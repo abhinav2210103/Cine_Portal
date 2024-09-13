@@ -1,40 +1,34 @@
-import React, { useEffect, useState } from 'react';
+"use client";
 
-function Timer() {
-    const [time, setTime] = useState({
-        hours: 3,
-        minutes: 0,
-        seconds: 0
-    });
+import { useRouter } from 'next/navigation';
+import React, { useEffect, useState } from 'react'
+import { useTimer } from 'react-timer-hook'
 
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setTime(prevTime => {
-                const { hours, minutes, seconds } = prevTime;
-
-                if (seconds > 0) {
-                    return { ...prevTime, seconds: seconds - 1 };
-                } else if (minutes > 0) {
-                    return { hours, minutes: minutes - 1, seconds: 59 };
-                } else if (hours > 0) {
-                    return { hours: hours - 1, minutes: 59, seconds: 59 };
-                } else {
-                    clearInterval(interval);
-                    return prevTime;
-                }
-            });
-        }, 1000);
-
-        return () => clearInterval(interval);
-    }, []);
-
-    const { hours, minutes, seconds } = time;
-
-    return (
-        <span className='text-lg'>
-            Time Left : <span>{`${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} hr`}</span>
-        </span>
-    );
+interface props {
+    remainTime: number;
 }
 
-export default Timer;
+export default function Timer(props: props) {
+    const router = useRouter()
+    const {
+        totalSeconds,
+        seconds,
+        minutes,
+        hours,
+        days,
+        isRunning,
+        start,
+        pause,
+        resume,
+        restart,
+    } = useTimer({ expiryTimestamp: new Date(Date.now() + parseInt(localStorage.getItem("TREM") || "")), onExpire: () => router.push("/feedback") });
+    useEffect(() => {
+        if (typeof window == undefined)
+            return;
+        const prevTime = parseInt(localStorage.getItem("TREM") || "");
+        localStorage.setItem("TREM", `${prevTime - 1000}`);
+    }, [seconds])
+    return (
+        <span>{hours < 10 ? `0${hours}` : hours}:{minutes < 10 ? `0${minutes}` : minutes}:{seconds < 10 ? `0${seconds}` : seconds}</span>
+    )
+}
