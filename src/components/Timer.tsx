@@ -21,7 +21,7 @@ export default function Timer(props: props) {
         pause,
         resume,
         restart,
-    } = useTimer({ expiryTimestamp: new Date(Date.now() + parseInt(localStorage.getItem("TREM") || "")), onExpire: () => router.push("/confirmation") });
+    } = useTimer({ expiryTimestamp: new Date(Date.now() + parseInt(localStorage.getItem("TREM") || "")), onExpire: () => router.push("/feedback") });
     useEffect(() => {
         if (typeof window == undefined)
             return;

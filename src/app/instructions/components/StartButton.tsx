@@ -40,7 +40,7 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ userId: userId, preference: selectedLanguage })
+                    body: JSON.stringify({ userId: userId, preference: parseInt(selectedLanguage) })
                 });
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
