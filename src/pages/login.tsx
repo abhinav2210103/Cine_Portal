@@ -90,7 +90,8 @@ const LoginComponent = () => {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        localStorage.setItem('userId', data.userId);
+        if (typeof window != undefined)
+          localStorage.setItem('userId', data.userId);
         const timeResponse = await fetch(`${baseurl}/student/timeRemaining?userId=${data.userId}`, {
           method: "GET",
           headers: {
@@ -100,7 +101,8 @@ const LoginComponent = () => {
         })
         const timeData = await timeResponse.json()
         console.log(timeData.remainingTime)
-        localStorage.setItem("TREM", timeData.remainingTime);
+        if (typeof window != undefined)
+          localStorage.setItem("TREM", timeData.remainingTime);
         resetForm();
         if (timeData.remainingTime == "10800000")
           router.push("/instructions");

@@ -15,9 +15,11 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
     const router = useRouter();
 
     useEffect(() => {
-        const storedUserId = localStorage.getItem('userId');
-        if (storedUserId) {
-            setUserId(storedUserId);
+        if (typeof window != undefined) {
+            const storedUserId = localStorage.getItem('userId');
+            if (storedUserId) {
+                setUserId(storedUserId);
+            }
         }
     }, []);
 

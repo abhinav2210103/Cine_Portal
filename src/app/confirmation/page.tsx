@@ -38,7 +38,7 @@ export default function Confirmation() {
     let remainTime;
     const [arr, setArr] = useState<number[]>([0, 0, 0, 0])
     const [sep, setSep] = useState<questionType[][]>([[], [], [], [], []])
-    let menu = ['HTML', 'SQL', 'CSS', 'Aptitude', 'Java'];
+    let menu = ['HTML', 'SQL', 'CSS', 'Aptitude', "Java"];
     let states = ["UA", "MR", "A", "NA"];
     let colors = ["#6B7280", "#ECB701", "#00C289", "#FF122E"];
     useEffect(() => {
@@ -53,8 +53,12 @@ export default function Confirmation() {
             }
             let responses = await responseFetcher(userId);
             let data: questionType[] = [];
-            for (let i = 0; i < ['HTML', 'SQL', 'CSS', 'Aptitude', localStorage.getItem("language")].length; i++) {
-                let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', localStorage.getItem("language") || ""], ['HTML', 'SQL', 'CSS', 'Aptitude', localStorage.getItem("language") || ""][i], userId, responses)
+            let language;
+            if (typeof window == undefined)
+                return;
+            language = localStorage.getItem('language');
+            for (let i = 0; i < ['HTML', 'SQL', 'CSS', 'Aptitude', language].length; i++) {
+                let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language || ""], ['HTML', 'SQL', 'CSS', 'Aptitude', language || ""][i], userId, responses)
                 data = [...data, ...temp];
             }
             dispatch(setQuestionsState(data))

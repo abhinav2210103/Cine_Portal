@@ -42,7 +42,7 @@ export default function Instruction() {
                     <div className='p-5 mt-6 relative bg-cover bg-center' style={{ backgroundImage: "url('/icons/bg.png')" }}>
                         <h1 className='font-bold mb-4 text-2xl ml-3'>INSTRUCTIONS</h1>
                         <div className='flex'>
-                            <Image src='/icons/verticalLine.png' alt="Vertical Line" width={5} height={50}  />
+                            <Image src='/icons/verticalLine.png' alt="Vertical Line" width={5} height={50} />
                             <ul className='list-disc w-[90%] text-justify ml-7 font-medium text-lg'>
                                 {instructions.map((instruction, index) => (
                                     <li key={index} className='mb-3'>{instruction}</li>

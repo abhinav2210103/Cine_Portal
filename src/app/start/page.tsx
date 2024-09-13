@@ -33,6 +33,8 @@ interface questionType {
 
 export default function page() {
     const query = useParams()
+    if (typeof window == undefined)
+        return;
     const [questions, setQuestions] = useState<questionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [remainTime, setRemainTime] = useState<number>(0)
@@ -74,8 +76,8 @@ export default function page() {
         for (const option of allQuestions[activeQuestionNumber - 1].options) {
             if (option.desc == answer) {
                 ansId = option.id
-                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
                 changeState(state, state == "NA" ? 0 : ansId)
+                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
                 setAnswer("")
             }
         }
@@ -83,8 +85,8 @@ export default function page() {
             toast.error("Please select an answer")
             return
         }
-        await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
         changeState(state, state == "NA" ? 0 : ansId)
+        await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
     }
 
 
@@ -101,7 +103,7 @@ export default function page() {
     const getQuestions = async () => {
         if (typeof window == undefined)
             return
-        const userId = localStorage.getItem("userId");
+        const userId = localStorage.getItem("userId")
         if (userId == null) {
             toast.error("User not found")
             router.replace("/login")
@@ -109,6 +111,8 @@ export default function page() {
         }
         let language = await languageFetcher(userId);
         setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language])
+        if (typeof window == undefined)
+            return;
         localStorage.setItem("language", language);
         let responses = await responseFetcher(userId);
         console.log(responses)

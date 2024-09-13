@@ -23,6 +23,8 @@ export default function Timer(props: props) {
         restart,
     } = useTimer({ expiryTimestamp: new Date(Date.now() + parseInt(localStorage.getItem("TREM") || "")), onExpire: () => router.push("/confirmation") });
     useEffect(() => {
+        if (typeof window == undefined)
+            return;
         const prevTime = parseInt(localStorage.getItem("TREM") || "");
         localStorage.setItem("TREM", `${prevTime - 1000}`);
     }, [seconds])
