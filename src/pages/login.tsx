@@ -99,12 +99,25 @@ const LoginComponent = () => {
           },
           credentials: "include",
         })
+        let flag = false;
+        try {
+          const prefererce = await fetch(`${baseurl}/student/getPreference?userId=${data.userId}`, {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            credentials: "include",
+          })
+          flag = true;
+        } catch (e) {
+          null
+        }
         const timeData = await timeResponse.json()
         console.log(timeData.remainingTime)
         if (typeof window != undefined)
           localStorage.setItem("TREM", timeData.remainingTime);
         resetForm();
-        if (timeData.remainingTime == "10800000")
+        if (timeData.remainingTime == "10800000" && flag)
           router.push("/instructions");
         else
           router.push("/start")
