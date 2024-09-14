@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
 
-// Dynamically import client-side container
+
 const SelectLanguageContainer = dynamic(() => import('./components/SelectLanguageContainer'), { ssr: false });
 
 export default function Instruction() {

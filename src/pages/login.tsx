@@ -82,11 +82,11 @@ const LoginComponent = () => {
         );
         if (!response.ok) {
           if (response.status === 400) {
+            console.log(response)
             toast.error("Invalid credentials. Please try again.");
           } else {
             toast.error("An unexpected error occurred. Please try again later.");
           }
-
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
