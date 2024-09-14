@@ -175,7 +175,7 @@ export default function page() {
                 <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10'>
                     <h1 className='text-3xl font-bold py-6'>Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}</h1>
                     <hr />
-                    <h1 className='font-semibold text-xl py-2'>{allQuestions[activeQuestionNumber - 1]?.question}</h1>
+                    <h1 className='font-semibold text-xl py-2'><pre>{allQuestions[activeQuestionNumber - 1]?.question}</pre></h1>
                     {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
                         <div key={id} className='my-4 cursor-pointer' >
                             <input type="radio" checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
