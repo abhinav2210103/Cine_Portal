@@ -149,33 +149,33 @@ export default function Page() {
         window.addEventListener('beforeunload', BeforeUnloadHandler, { capture: true })
     }, [])
 
-    // useEffect(() => {
-    //     const disableTabChange = (event: KeyboardEvent) => {
-    //         if (event.ctrlKey && (event.key === 'Tab' || event.key === 't' || event.key === 'T')) {
-    //             event.preventDefault();
-    //         }
-    //     };
+    useEffect(() => {
+        const disableTabChange = (event: KeyboardEvent) => {
+            if (event.ctrlKey && (event.key === 'Tab' || event.key === 't' || event.key === 'T')) {
+                event.preventDefault();
+            }
+        };
 
-    //     const disableKeydown = (event: KeyboardEvent) => {
-    //         if (event.ctrlKey || event.altKey || event.metaKey) {
-    //             event.preventDefault();
-    //         }
-    //     };
+        const disableKeydown = (event: KeyboardEvent) => {
+            if (event.ctrlKey || event.altKey || event.metaKey) {
+                event.preventDefault();
+            }
+        };
 
-    //     const disableContextMenu = (event: MouseEvent) => {
-    //         event.preventDefault();
-    //     };
+        const disableContextMenu = (event: MouseEvent) => {
+            event.preventDefault();
+        };
 
-    //     window.addEventListener('keydown', disableTabChange);
-    //     window.addEventListener('keydown', disableKeydown);
-    //     window.addEventListener('contextmenu', disableContextMenu);
+        window.addEventListener('keydown', disableTabChange);
+        window.addEventListener('keydown', disableKeydown);
+        window.addEventListener('contextmenu', disableContextMenu);
 
-    //     return () => {
-    //         window.removeEventListener('keydown', disableTabChange);
-    //         window.removeEventListener('keydown', disableKeydown);
-    //         window.removeEventListener('contextmenu', disableContextMenu);
-    //     };
-    // }, []);
+        return () => {
+            window.removeEventListener('keydown', disableTabChange);
+            window.removeEventListener('keydown', disableKeydown);
+            window.removeEventListener('contextmenu', disableContextMenu);
+        };
+    }, []);
 
     useEffect(() => {
 
