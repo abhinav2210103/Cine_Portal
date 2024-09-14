@@ -81,8 +81,8 @@ const LoginComponent = () => {
           }
         );
         if (!response.ok) {
+          console.log("API call error response:", response);
           if (response.status === 400) {
-            console.log(response)
             toast.error("Invalid credentials. Please try again.");
           } else {
             toast.error("An unexpected error occurred. Please try again later.");
