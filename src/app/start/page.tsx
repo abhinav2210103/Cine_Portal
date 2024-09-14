@@ -129,6 +129,21 @@ export default function page() {
         setLoading(false)
     }
 
+
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerHeight < window.outerHeight) {
+                toast.error("Full screen mode is compulsory, exiting full screen can result in disqualification")
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+
     useEffect(() => {
         function BeforeUnloadHandler(event: BeforeUnloadEvent) {
             event.preventDefault();
@@ -138,7 +153,7 @@ export default function page() {
     }, [])
 
     useEffect(() => {
-        console.log(query)
+
         if (typeof window == undefined)
             return
         if (localStorage.getItem("userId") == null) {
@@ -175,7 +190,7 @@ export default function page() {
                 <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10'>
                     <h1 className='text-3xl font-bold py-6'>Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}</h1>
                     <hr />
-                    <h1 className='font-semibold text-xl py-2'>{allQuestions[activeQuestionNumber - 1]?.question}</h1>
+                    <h1 className='font-semibold text-xl py-2'><pre className='w-[100px]'>{allQuestions[activeQuestionNumber - 1]?.question}</pre></h1>
                     {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
                         <div key={id} className='my-4 cursor-pointer' >
                             <input type="radio" checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
