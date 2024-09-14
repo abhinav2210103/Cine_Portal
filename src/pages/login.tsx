@@ -80,6 +80,7 @@ const LoginComponent = () => {
             credentials: "include",
           }
         );
+        console.log(response);
         if (!response.ok) {
           console.log("API call error response:", response);
           if (response.status === 400) {
@@ -110,7 +111,6 @@ const LoginComponent = () => {
           router.push("/start")
       } catch (error) {
         console.error("Login failed:", error);
-        toast.error("Login failed");
       } finally {
         setDisabled(false);
       }
@@ -173,7 +173,7 @@ const LoginComponent = () => {
                     Password:
                   </label>
                   <div className="border-2 border-black py-3 px-2 rounded-lg flex gap-2 w-[20rem] justify-evenly">
-                    <div>
+                    <div className="ml-2">
                       <FaKey size={24} />
                     </div>
                     <input
@@ -184,7 +184,7 @@ const LoginComponent = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.password}
-                      className="bg-transparent border-none outline-none"
+                      className="bg-transparent border-none outline-none w-[17rem] focus:bg-transparent"
                     />
                     <div className="cursor-pointer" onClick={togglePassword}>
                       {passwordVisible ? (
