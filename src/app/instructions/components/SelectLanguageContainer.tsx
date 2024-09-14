@@ -5,6 +5,9 @@ import StartButton from './StartButton';
 
 export default function SelectLanguageContainer() {
     const [selectedLanguage, setSelectedLanguage] = useState<string>('');
+    if (typeof window == undefined) {
+        return;
+    }
 
     return (
         <div className='flex justify-start'>

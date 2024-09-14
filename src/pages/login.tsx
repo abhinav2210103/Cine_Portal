@@ -20,7 +20,7 @@ export default function Login(): React.ReactElement {
       scriptProps={{ async: true }}
     >
       <LoginComponent />
-      <ToastContainer/>
+      <ToastContainer />
     </GoogleReCaptchaProvider>
   );
 }
@@ -33,6 +33,13 @@ const LoginComponent = () => {
   const router = useRouter();
 
   useEffect(() => {
+    if (typeof window == undefined)
+      return
+    const userId = localStorage.getItem("userId")
+    const trem = localStorage.getItem("TREM");
+    if (userId != undefined) {
+      router.replace("/start")
+    }
     const Backgroundimage = new Image();
     Backgroundimage.src = "./cine-bg.png";
     Backgroundimage.onload = () => {
@@ -73,26 +80,39 @@ const LoginComponent = () => {
             credentials: "include",
           }
         );
+        console.log(response);
         if (!response.ok) {
+          console.log("API call error response:", response);
           if (response.status === 400) {
             toast.error("Invalid credentials. Please try again.");
           } else {
             toast.error("An unexpected error occurred. Please try again later.");
           }
-          
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
         const data = await response.json();
-        localStorage.setItem('userId', data.userId);
+        if (typeof window != undefined)
+          localStorage.setItem('userId', data.userId);
+        const timeResponse = await fetch(`${baseurl}/student/timeRemaining?userId=${data.userId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        })
+        const timeData = await timeResponse.json()
+        console.log(timeData.remainingTime)
+        if (typeof window != undefined)
+          localStorage.setItem("TREM", timeData.remainingTime);
         resetForm();
-        toast.success("Login successful! Redirecting...");
-        router.push("/instructions");
+        if (timeData.remainingTime == "10800000")
+          router.push("/instructions");
+        else
+          router.push("/start")
       } catch (error) {
         console.error("Login failed:", error);
-        toast.error("Login failed");
-        
       } finally {
-        setDisabled(false); 
+        setDisabled(false);
       }
     },
   });
@@ -141,7 +161,7 @@ const LoginComponent = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.studentNumber}
-                      className="bg-transparent border-none outline-none w-[17rem]"
+                      className="bg-transparent border-none outline-none w-[17rem] focus:bg-transparent"
                     />
                   </div>
                   {touched.studentNumber && errors.studentNumber ? (
