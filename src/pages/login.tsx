@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+
 export default function Login(): React.ReactElement {
   return (
     <GoogleReCaptchaProvider
@@ -33,20 +34,23 @@ const LoginComponent = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window == undefined)
-      return
-    const userId = localStorage.getItem("userId")
+    if (typeof window === "undefined") return;
+    const userId = localStorage.getItem("userId");
     const trem = localStorage.getItem("TREM");
-    if (userId != undefined) {
-      router.replace("/start")
+    const language = localStorage.getItem("language");
+    if (userId && !language) {
+      router.replace("/instructions");
+    } else if (userId && language) {
+      router.replace("/start");
     }
+  
     const Backgroundimage = new Image();
     Backgroundimage.src = "./cine-bg.png";
     Backgroundimage.onload = () => {
       setBackgroundLoaded(true);
     };
   }, []);
-
+  
   const {
     values,
     errors,
@@ -68,6 +72,7 @@ const LoginComponent = () => {
           console.error("ReCAPTCHA not available");
           return;
         }
+        console.log("ok")
         const token = await executeRecaptcha("Login");
         const response = await fetch(
           `${baseurl}/student/login`,
@@ -98,16 +103,35 @@ const LoginComponent = () => {
             "Content-Type": "application/json",
           },
           credentials: "include",
-        })
-        const timeData = await timeResponse.json()
-        console.log(timeData.remainingTime)
+        });
+        const timeData = await timeResponse.json();
+
         if (typeof window != undefined)
           localStorage.setItem("TREM", timeData.remainingTime);
+        
         resetForm();
-        if (timeData.remainingTime == "10800000")
+        
+        const preferenceResponse = await fetch(`${baseurl}/student/getPreference?userId=${data.userId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+        const preferenceData = await preferenceResponse.json();
+
+        if (preferenceData.message === "Invalid preference number") {
+          console.log(preferenceData.message)
           router.push("/instructions");
-        else
-          router.push("/start")
+        } else {
+            router.push("/start")
+        }
+         
+          // if (timeData.remainingTime == "10800000")
+          //   router.push("/instructions");
+          // else
+          //   router.push("/start");
+        
       } catch (error) {
         console.error("Login failed:", error);
         toast.error("Login failed");
