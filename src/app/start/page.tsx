@@ -38,6 +38,7 @@ export default function page() {
     const [questions, setQuestions] = useState<questionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [remainTime, setRemainTime] = useState<number>(0)
+    const [fullScreen, setFullScreen] = useState<boolean>(true);
     const router = useRouter()
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java']);
     const [activeMenu, setActiveMenu] = useState<number>(0)
@@ -110,6 +111,15 @@ export default function page() {
             return
         }
         let language = await languageFetcher(userId);
+        console.log(language)
+        if (language == undefined) {
+            if (typeof window == undefined)
+                return;
+            localStorage.removeItem("userId");
+            localStorage.removeItem("language");
+            localStorage.removeItem("TREM");
+            router.push("/login")
+        }
         setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language])
         if (typeof window == undefined)
             return;
@@ -134,6 +144,9 @@ export default function page() {
         const handleResize = () => {
             if (window.innerHeight < window.outerHeight) {
                 toast.error("Full screen mode is compulsory, exiting full screen can result in disqualification")
+            }
+            else {
+                setFullScreen(false);
             }
         };
 
@@ -167,7 +180,7 @@ export default function page() {
     }, [])
 
     return (
-        <div><Toaster />{loading ? <Loader /> : <div className='bg-[#EAEEFF] h-screen relative'>
+        <div><Toaster />{loading ? <Loader /> : !fullScreen ? <div className='bg-[#EAEEFF] h-screen relative'>
 
             <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
                 <div className='flex justify-center items-center'>
@@ -225,7 +238,7 @@ export default function page() {
                 </div>
             </div>
             <Image src="./icons/bg_logo.svg" alt="bgLogo" priority width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
-        </div>}</div>
+        </div> : <div className='flex justify-center items-center w-full h-screen text-xl font-bold'>Please do the Full Screen Mode to Start!</div>}</div>
     )
 }
 
