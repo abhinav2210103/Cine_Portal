@@ -80,6 +80,7 @@ const LoginComponent = () => {
             credentials: "include",
           }
         );
+        console.log(response);
         if (!response.ok) {
           console.log("API call error response:", response);
           if (response.status === 400) {
@@ -110,7 +111,6 @@ const LoginComponent = () => {
           router.push("/start")
       } catch (error) {
         console.error("Login failed:", error);
-        toast.error("Login failed");
       } finally {
         setDisabled(false);
       }
@@ -161,7 +161,7 @@ const LoginComponent = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.studentNumber}
-                      className="bg-transparent border-none outline-none w-[17rem]"
+                      className="bg-transparent border-none outline-none w-[17rem] focus:bg-transparent"
                     />
                   </div>
                   {touched.studentNumber && errors.studentNumber ? (
