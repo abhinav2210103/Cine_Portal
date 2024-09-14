@@ -1,5 +1,5 @@
-'use client'
-import React, { useEffect, useState } from 'react'
+'use client';
+import React, { useEffect, useState } from 'react';
 import { QuesNoCard } from '@/components/QuesNoCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -11,145 +11,150 @@ import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
 import { responseFetcher } from '@/constants/responseFetcher';
 import { responseSetter } from '@/constants/responseSetter';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Timer from '@/components/Timer';
 import { languageFetcher } from '@/constants/languageFetcher';
 
-interface option {
+interface Option {
     desc: string,
     id: number,
 }
 
-interface questionType {
+interface QuestionType {
     _id: string,
     state: string,
     quesId: number,
     subject: string,
     question: string,
-    options: option[],
+    options: Option[],
     recordedAns: number,
     answer: number
 }
 
-export default function page() {
-    const query = useParams()
-    if (typeof window == undefined)
-        return;
-    const [questions, setQuestions] = useState<questionType[]>([]);
+export default function Page() {
+    const query = useParams();
+    const [questions, setQuestions] = useState<QuestionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [remainTime, setRemainTime] = useState<number>(0)
-    const router = useRouter()
+    const [remainTime, setRemainTime] = useState<number>(0);
+    const router = useRouter();
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java']);
-    const [activeMenu, setActiveMenu] = useState<number>(0)
-    const [subject, setSubject] = useState<string>("HTML")
+    const [activeMenu, setActiveMenu] = useState<number>(0);
+    const [subject, setSubject] = useState<string>("HTML");
     const dispatch = useDispatch();
     const activeQuestionNumber = useSelector((state: RootState) => state.question.activeQuestionNumber);
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const [idx, setIdx] = useState<number>(activeQuestionNumber);
-    const [answer, setAnswer] = useState<string>("")
+    const [answer, setAnswer] = useState<string>("");
+
     const changeState = (type: string, ansId: number) => {
-        let temp: questionType[] = []
+        let temp: QuestionType[] = [];
         allQuestions.forEach((element, id) => {
-            id + 1 == activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element)
+            id + 1 === activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element);
         });
-        if (activeQuestionNumber == allQuestions.length) {
-            dispatch(setActiveQuestionNumber(1))
+        if (activeQuestionNumber === allQuestions.length) {
+            dispatch(setActiveQuestionNumber(1));
+        } else {
+            setActiveMenu(Math.floor(allQuestions[activeQuestionNumber].quesId / 100) - 1);
+            dispatch(setActiveQuestionNumber(activeQuestionNumber + 1));
         }
-        else {
-            setActiveMenu(Math.floor(allQuestions[activeQuestionNumber].quesId / 100) - 1)
-            dispatch(setActiveQuestionNumber(activeQuestionNumber + 1))
-        }
-        dispatch(setQuestionsState(temp))
-    }
+        dispatch(setQuestionsState(temp));
+    };
 
     const buttonHandler = async (state: string) => {
         let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;
         if (["NA", "MR", "A"].indexOf(state) < ["NA", "MR", "A"].indexOf(allQuestions[activeQuestionNumber - 1].state)) {
-            toast.error("Already saved and recorded")
-            return
-        }
-        if (typeof window == undefined)
-            return
-        const userId = localStorage.getItem("userId");
-        if (userId == null)
+            toast.error("Already saved and recorded");
             return;
+        }
+        const userId = localStorage.getItem("userId");
+        if (!userId) return;
         for (const option of allQuestions[activeQuestionNumber - 1].options) {
-            if (option.desc == answer) {
-                ansId = option.id
-                changeState(state, state == "NA" ? 0 : ansId)
-                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
-                setAnswer("")
+            if (option.desc === answer) {
+                ansId = option.id;
+                changeState(state, state === "NA" ? 0 : ansId);
+                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
+                setAnswer("");
             }
         }
-        if (ansId == 0 && state != "NA") {
-            toast.error("Please select an answer")
-            return
+        if (ansId === 0 && state !== "NA") {
+            toast.error("Please select an answer");
+            return;
         }
-        changeState(state, state == "NA" ? 0 : ansId)
-        await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
-    }
-
+        changeState(state, state === "NA" ? 0 : ansId);
+        await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
+    };
 
     const clearResponseHandler = () => {
-        const currentState: string = allQuestions[activeQuestionNumber - 1]?.state
-        if (currentState != "A" && currentState != "MR") {
+        const currentState: string = allQuestions[activeQuestionNumber - 1]?.state;
+        if (currentState !== "A" && currentState !== "MR") {
             setAnswer("");
+        } else {
+            toast.error("Already saved and recorded");
         }
-        else {
-            toast.error("Already saved and recorded")
-        }
-    }
+    };
 
     const getQuestions = async () => {
-        if (typeof window == undefined)
-            return
-        const userId = localStorage.getItem("userId")
-        if (userId == null) {
-            toast.error("User not found")
-            router.replace("/login")
-            return
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+            toast.error("User not found");
+            router.replace("/login");
+            return;
         }
         let language = await languageFetcher(userId);
-        setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language])
-        if (typeof window == undefined)
-            return;
+        setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language]);
         localStorage.setItem("language", language);
         let responses = await responseFetcher(userId);
-        console.log(responses)
         if (responses?.message) {
-            router.replace("/login")
-            return
+            router.replace("/login");
+            return;
         }
-        let data: questionType[] = [];
+        let data: QuestionType[] = [];
         for (let i = 0; i < navMenu.length; i++) {
-            let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language], ['HTML', 'SQL', 'CSS', 'Aptitude', language][i], userId, responses)
+            let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language], ['HTML', 'SQL', 'CSS', 'Aptitude', language][i], userId, responses);
             data = [...data, ...temp];
         }
-        dispatch(setQuestionsState(data))
-        setLoading(false)
-    }
+        dispatch(setQuestionsState(data));
+        setLoading(false);
+    };
 
     useEffect(() => {
-        function BeforeUnloadHandler(event: BeforeUnloadEvent) {
+        const disableTabChange = (event: KeyboardEvent) => {
+            if (event.ctrlKey && (event.key === 'Tab' || event.key === 't' || event.key === 'T')) {
+                event.preventDefault();
+            }
+        };
+
+        const disableKeydown = (event: KeyboardEvent) => {
+            if (event.ctrlKey || event.altKey || event.metaKey) {
+                event.preventDefault();
+            }
+        };
+
+        const disableContextMenu = (event: MouseEvent) => {
             event.preventDefault();
-            return (event.returnValue = "")
-        }
-        window.addEventListener('beforeunload', BeforeUnloadHandler, { capture: true })
-    }, [])
+        };
+
+        window.addEventListener('keydown', disableTabChange);
+        window.addEventListener('keydown', disableKeydown);
+        window.addEventListener('contextmenu', disableContextMenu);
+
+        return () => {
+            window.removeEventListener('keydown', disableTabChange);
+            window.removeEventListener('keydown', disableKeydown);
+            window.removeEventListener('contextmenu', disableContextMenu);
+        };
+    }, []);
 
     useEffect(() => {
-        console.log(query)
-        if (typeof window == undefined)
-            return
         if (localStorage.getItem("userId") == null) {
-            router.replace("/login")
+            router.replace("/login");
         }
         if (localStorage.getItem("TREM") != null) {
-            let data: number = parseInt(localStorage.getItem("TREM") || "0")
-            setRemainTime(data)
+            let data: number = parseInt(localStorage.getItem("TREM") || "0");
+            setRemainTime(data);
         }
-        getQuestions()
-    }, [])
+        getQuestions();
+    }, []);
 
     return (
         <div><Toaster />{loading ? <Loader /> : <div className='bg-[#EAEEFF] h-screen relative'>
@@ -213,5 +218,3 @@ export default function page() {
         </div>}</div>
     )
 }
-
-
