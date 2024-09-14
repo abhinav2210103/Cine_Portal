@@ -66,7 +66,16 @@ export default function Page() {
         if (!response.ok) {
           throw new Error('Network error');
         }
-
+        const submitResponse = await fetch(baseurl + "/student/submitTest", {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ userId }),
+        });
+        if (!submitResponse.ok) {
+          throw new Error('Network error');
+        }
         const data = await response.json();
         router.replace("/thankyou")
         setLoading(false);
