@@ -33,6 +33,8 @@ interface QuestionType {
 
 export default function Page() {
     const query = useParams();
+    if (typeof window == undefined)
+        return;
     const [questions, setQuestions] = useState<QuestionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [remainTime, setRemainTime] = useState<number>(0);
@@ -66,6 +68,8 @@ export default function Page() {
             toast.error("Already saved and recorded");
             return;
         }
+        if (typeof window == undefined)
+            return
         const userId = localStorage.getItem("userId");
         if (!userId) return;
         for (const option of allQuestions[activeQuestionNumber - 1].options) {
@@ -94,6 +98,8 @@ export default function Page() {
     };
 
     const getQuestions = async () => {
+        if (typeof window == undefined)
+            return
         const userId = localStorage.getItem("userId");
         if (!userId) {
             toast.error("User not found");
@@ -102,6 +108,8 @@ export default function Page() {
         }
         let language = await languageFetcher(userId);
         setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language]);
+        if (typeof window == undefined)
+            return;
         localStorage.setItem("language", language);
         let responses = await responseFetcher(userId);
         if (responses?.message) {
@@ -134,46 +142,40 @@ export default function Page() {
 
 
     useEffect(() => {
-        const handleResize = () => {
-            if (window.innerHeight < window.outerHeight) {
-                toast.error("Full screen mode is compulsory, exiting full screen can result in disqualification")
-            }
-        };
-
-        window.addEventListener('resize', handleResize);
-
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-
-    useEffect(() => {
-        const disableTabChange = (event: KeyboardEvent) => {
-            if (event.ctrlKey && (event.key === 'Tab' || event.key === 't' || event.key === 'T')) {
-                event.preventDefault();
-            }
-        };
-
-        const disableKeydown = (event: KeyboardEvent) => {
-            if (event.ctrlKey || event.altKey || event.metaKey) {
-                event.preventDefault();
-            }
-        };
-
-        const disableContextMenu = (event: MouseEvent) => {
+        function BeforeUnloadHandler(event: BeforeUnloadEvent) {
             event.preventDefault();
-        };
+            return (event.returnValue = "")
+        }
+        window.addEventListener('beforeunload', BeforeUnloadHandler, { capture: true })
+    }, [])
 
-        window.addEventListener('keydown', disableTabChange);
-        window.addEventListener('keydown', disableKeydown);
-        window.addEventListener('contextmenu', disableContextMenu);
+    // useEffect(() => {
+    //     const disableTabChange = (event: KeyboardEvent) => {
+    //         if (event.ctrlKey && (event.key === 'Tab' || event.key === 't' || event.key === 'T')) {
+    //             event.preventDefault();
+    //         }
+    //     };
 
-        return () => {
-            window.removeEventListener('keydown', disableTabChange);
-            window.removeEventListener('keydown', disableKeydown);
-            window.removeEventListener('contextmenu', disableContextMenu);
-        };
-    }, []);
+    //     const disableKeydown = (event: KeyboardEvent) => {
+    //         if (event.ctrlKey || event.altKey || event.metaKey) {
+    //             event.preventDefault();
+    //         }
+    //     };
+
+    //     const disableContextMenu = (event: MouseEvent) => {
+    //         event.preventDefault();
+    //     };
+
+    //     window.addEventListener('keydown', disableTabChange);
+    //     window.addEventListener('keydown', disableKeydown);
+    //     window.addEventListener('contextmenu', disableContextMenu);
+
+    //     return () => {
+    //         window.removeEventListener('keydown', disableTabChange);
+    //         window.removeEventListener('keydown', disableKeydown);
+    //         window.removeEventListener('contextmenu', disableContextMenu);
+    //     };
+    // }, []);
 
     useEffect(() => {
 
