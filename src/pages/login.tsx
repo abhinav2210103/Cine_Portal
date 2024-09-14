@@ -80,6 +80,7 @@ const LoginComponent = () => {
             credentials: "include",
           }
         );
+        console.log(response);
         if (!response.ok) {
           if (response.status === 400) {
             toast.error("Invalid credentials. Please try again.");
@@ -160,7 +161,7 @@ const LoginComponent = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.studentNumber}
-                      className="bg-transparent border-none outline-none w-[17rem]"
+                      className="bg-transparent border-none outline-none w-[17rem] focus:bg-transparent"
                     />
                   </div>
                   {touched.studentNumber && errors.studentNumber ? (
