@@ -244,34 +244,38 @@ export default function Page() {
             </div>
             <div className='w-[94%] mt-8 m-auto flex justify-between items-center'>
                 <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 relative'>
-                    <h1 className='text-3xl font-bold py-6'>Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}</h1>
-                    <hr />
-                    <h1 className='font-semibold text-xl py-2'><pre className='w-3/4 whitespace-pre-wrap break-words overflow-auto'>{allQuestions[activeQuestionNumber - 1]?.question}</pre></h1>
-                    {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
-                        <div key={id} className='my-4 cursor-pointer'>
-                            <input
-                                type="radio"
-                                id={`opt${activeQuestionNumber}-${id}`}
-                                checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
-                                onChange={() => {setAnswer(i.desc);}}
-                                name={`opt${activeQuestionNumber}`}
-                            />
-                            <label
-                                className='ml-2 text-[17px] font-medium cursor-pointer'
-                                htmlFor={`opt${activeQuestionNumber}-${id}`}
-                            >
-                                {i.desc}
-                            </label>
-                        </div>
-                    ))}
-
-                    <div className='bottom-7 absolute'>
+                    <div className='overflow-y-auto h-[calc(100%-80px)]'>                    
+                        <h1 className='text-3xl font-bold py-6'>Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}</h1>
+                        <hr />
+                        <h1 className='font-semibold text-xl py-2'>
+                            <pre className='w-3/4 whitespace-pre-wrap break-words'>{allQuestions[activeQuestionNumber - 1]?.question}</pre>
+                        </h1>
+                        {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
+                            <div key={id} className='my-4 cursor-pointer'>
+                                <input
+                                    type="radio"
+                                    id={`opt${activeQuestionNumber}-${id}`}
+                                    checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
+                                    onChange={() => { setAnswer(i.desc); }}
+                                    name={`opt${activeQuestionNumber}`}
+                                />
+                                <label
+                                    className='ml-2 text-[17px] font-medium cursor-pointer'
+                                    htmlFor={`opt${activeQuestionNumber}-${id}`}
+                                >
+                                    {i.desc}
+                                </label>
+                            </div>
+                        ))}
+                    </div>
+                    <div className='absolute bottom-7'>
                         <button className='bg-yellow-500 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("MR")}>Mark for Review & Next</button>
                         <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("A")}>Save & Next</button>
                         <button className='bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("NA")}>Skip</button>
                         <button className='bg-white outline outline-1 outline-black mx-2 rounded-xl px-4 py-[10px] text-sm text-black font-medium' onClick={clearResponseHandler}>Clear Response</button>
                     </div>
                 </div>
+
                 <div className='w-[25%] h-[72vh] bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 flex flex-col justify-center items-center'>
                     <div className='w-[90%] outline outline-3 outline-[#546CFF] mb-3 text-2xl text-center rounded-lg font-bold text-[#546CFF] p-2'>
                         Questions
