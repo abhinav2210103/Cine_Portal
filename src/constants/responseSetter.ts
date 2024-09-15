@@ -12,6 +12,8 @@ async function responseSetter(
         status: status,
         ansId: ansId,
     };
+    console.log(obj);
+    
     const res = await fetch(process.env.BACKEND_URL + "/student/response", {
         method: "POST",
         headers: {

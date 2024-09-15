@@ -49,9 +49,15 @@ export default function Page() {
     const [answer, setAnswer] = useState<string>("");
 
     const changeState = (type: string, ansId: number) => {
-        let temp: QuestionType[] = [];
-        allQuestions.forEach((element, id) => {
-            id + 1 === activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element);
+        // let temp: QuestionType[] = [];
+        // allQuestions.forEach((element, id) => {
+        //     id + 1 === activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element);
+        // });
+        let temp = allQuestions.map((element, id) => {
+            if (id + 1 === activeQuestionNumber) {
+                return { ...element, state: type, recordedAns: ansId };
+            }
+            return element;
         });
         if (activeQuestionNumber === allQuestions.length) {
             dispatch(setActiveQuestionNumber(1));
@@ -64,29 +70,27 @@ export default function Page() {
 
     const buttonHandler = async (state: string) => {
         let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;
-        if (["NA", "MR", "A"].indexOf(state) < ["NA", "MR", "A"].indexOf(allQuestions[activeQuestionNumber - 1].state)) {
-            toast.error("Already saved and recorded");
-            return;
-        }
-        if (typeof window == undefined)
-            return
-        const userId = localStorage.getItem("userId");
-        if (!userId) return;
+        console.log("Current Answer:", answer);
+        
         for (const option of allQuestions[activeQuestionNumber - 1].options) {
+            console.log("Checking option:", option);
             if (option.desc === answer) {
                 ansId = option.id;
                 changeState(state, state === "NA" ? 0 : ansId);
-                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
+                const userId = localStorage.getItem("userId");
+                if (userId) {
+                    await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
+                }
                 setAnswer("");
             }
         }
+    
         if (ansId === 0 && state !== "NA") {
             toast.error("Please select an answer");
             return;
         }
-        changeState(state, state === "NA" ? 0 : ansId);
-        await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
     };
+    
 
     const clearResponseHandler = () => {
         const currentState: string = allQuestions[activeQuestionNumber - 1]?.state;
@@ -215,16 +219,28 @@ export default function Page() {
                 <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10'>
                     <h1 className='text-3xl font-bold py-6'>Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}</h1>
                     <hr />
-                    <h1 className='font-semibold text-xl py-2'><pre className='w-[100px]'>{allQuestions[activeQuestionNumber - 1]?.question}</pre></h1>
+                    <h1 className='font-semibold text-xl py-2'><pre className='w-3/4 whitespace-pre-wrap break-words overflow-auto'>{allQuestions[activeQuestionNumber - 1]?.question}</pre></h1>
                     {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
-                        <div key={id} className='my-4 cursor-pointer' >
-                            <input type="radio" checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
+                        <div key={id} className='my-4 cursor-pointer'>
+                            <input 
+                                type="radio" 
+                                id={`opt${activeQuestionNumber}-${id}`} 
+                                checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
                                 onChange={() => {
-                                    setAnswer(i.desc)
-                                }} name={`opt${activeQuestionNumber}${i.id}`} id={`opt${activeQuestionNumber}${i.id}`} />
-                            <label className='ml-2 text-[17px] font-medium cursor-pointer' htmlFor={`opt${activeQuestionNumber}${i.id}`}>{i.desc}</label>
+                                    console.log("Answer:", i.desc, " " + i.id);
+                                    setAnswer(i.desc);                                    
+                                }}
+                                name={`opt${activeQuestionNumber}`} 
+                            />
+                            <label 
+                                className='ml-2 text-[17px] font-medium cursor-pointer' 
+                                htmlFor={`opt${activeQuestionNumber}-${id}`} 
+                            >
+                                {i.desc}
+                            </label>
                         </div>
                     ))}
+
                     <div className='mt-[19vh]'>
                         <button className='bg-yellow-500 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("MR")}>Mark for Review & Next</button>
                         <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("A")}>Save & Next</button>
