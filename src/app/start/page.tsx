@@ -65,7 +65,6 @@ export default function Page() {
 
     const buttonHandler = async (state: string) => {
         let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;
-        console.log("Current Answer:", answer);
         const userId = localStorage.getItem("userId");
 
         if(answer == "" && state == "NA" ){
@@ -101,7 +100,7 @@ export default function Page() {
             toast.error("Please select an answer");
             return;
         }
-    };
+    };    
 
 
     const clearResponseHandler = () => {
@@ -123,7 +122,6 @@ export default function Page() {
             return;
         }
         let language = await languageFetcher(userId);
-        console.log(language)
         if (language == undefined) {
             if (typeof window == undefined)
                 return;
@@ -255,10 +253,7 @@ export default function Page() {
                                 type="radio"
                                 id={`opt${activeQuestionNumber}-${id}`}
                                 checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
-                                onChange={() => {
-                                    console.log("Answer:", i.desc, " " + i.id);
-                                    setAnswer(i.desc);
-                                }}
+                                onChange={() => {setAnswer(i.desc);}}
                                 name={`opt${activeQuestionNumber}`}
                             />
                             <label

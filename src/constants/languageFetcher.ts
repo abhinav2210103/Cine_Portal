@@ -9,10 +9,9 @@ async function languageFetcher(userId: string) {
             { method: "GET" }
         );
         const data = await res.json();
-        console.log(data);
         return data.language;
     } catch (error) {
-        console.log("Error fetching language : " + error);
+        // console.log("Error fetching language : " + error);
     }
 }
 

@@ -68,12 +68,12 @@ const LoginComponent = () => {
     onSubmit: async (values) => {
       setDisabled(true);
       try {
-        if (!executeRecaptcha) {
-          console.error("ReCAPTCHA not available");
-          return;
-        }
-        console.log("ok")
-        const token = await executeRecaptcha("Login");
+        // if (!executeRecaptcha) {
+        //   console.error("ReCAPTCHA not available");
+        //   return;
+        // }
+        // console.log("ok")
+        // const token = await executeRecaptcha("Login");
         const response = await fetch(
           `${baseurl}/student/login`,
           {
@@ -81,18 +81,18 @@ const LoginComponent = () => {
             headers: {
               "Content-Type": "application/json",
             },
-            body: JSON.stringify({ ...values, token }),
+            body: JSON.stringify({ ...values }),
             credentials: "include",
           }
         );
-        const responseData = await response.json(); 
-        if( responseData.message === "Test already submitted") {
+
+        const data = await response.json();         
+        if( data.message === "Test already submitted") {
           toast.error("Test already submitted. Please contact the invigilator.");
           setDisabled(false);
           return;
         }
         if (!response.ok) {
-          console.log("API call error response:", response);
           if (response.status === 400) {
             
             toast.error("Invalid credentials. Please try again.");
@@ -101,7 +101,6 @@ const LoginComponent = () => {
           }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        const data = await response.json();
         if (typeof window != undefined)
           localStorage.setItem('userId', data.userId);
         const timeResponse = await fetch(`${baseurl}/student/timeRemaining?userId=${data.userId}`, {
@@ -128,7 +127,6 @@ const LoginComponent = () => {
         const preferenceData = await preferenceResponse.json();
 
         if (preferenceData.message === "Invalid preference number") {
-          console.log(preferenceData.message)
           router.push("/instructions");
         } else {
             router.push("/start")
