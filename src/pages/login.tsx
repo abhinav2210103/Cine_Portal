@@ -213,7 +213,7 @@ const LoginComponent = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.password}
-                      className="bg-transparent border-none outline-none w-[17rem] focus:bg-transparent"
+                      className="bg-transparent border-none outline-none w-[14rem] focus:bg-transparent"
                     />
                     <div className="cursor-pointer" onClick={togglePassword}>
                       {passwordVisible ? (
