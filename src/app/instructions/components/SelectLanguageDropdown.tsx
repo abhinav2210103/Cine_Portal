@@ -12,16 +12,17 @@ export default function SelectLanguageDropdown({ selectedLanguage, setSelectedLa
         return;
     }
     const languages = [
-        { value: 0, label: "" },
-        { value: 3, label: "C" },
-        { value: 4, label: "C++" },
-        { value: 6, label: "Java" },
-        { value: 5, label: "Python" },
+        { value: "", label: "" }, 
+        { value: "3", label: "C" },
+        { value: "4", label: "C++" },
+        { value: "6", label: "Java" },
+        { value: "5", label: "Python" },
     ];
-
+    
     const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
         setSelectedLanguage(event.target.value);
     };
+    
 
     return (
         <>
