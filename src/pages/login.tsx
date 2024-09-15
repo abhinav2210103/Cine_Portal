@@ -43,14 +43,14 @@ const LoginComponent = () => {
     } else if (userId && language) {
       router.replace("/start");
     }
-  
+
     const Backgroundimage = new Image();
     Backgroundimage.src = "./cine-bg.png";
     Backgroundimage.onload = () => {
       setBackgroundLoaded(true);
     };
   }, []);
-  
+
   const {
     values,
     errors,
@@ -115,9 +115,9 @@ const LoginComponent = () => {
 
         if (typeof window != undefined)
           localStorage.setItem("TREM", timeData.remainingTime);
-        
+
         resetForm();
-        
+
         const preferenceResponse = await fetch(`${baseurl}/student/getPreference?userId=${data.userId}`, {
           method: "GET",
           headers: {
@@ -133,14 +133,15 @@ const LoginComponent = () => {
         } else {
             router.push("/start")
         }
-         
+
           // if (timeData.remainingTime == "10800000")
           //   router.push("/instructions");
           // else
           //   router.push("/start");
-        
+
       } catch (error) {
         console.error("Login failed:", error);
+        toast.error("Login failed");
       } finally {
         setDisabled(false);
       }

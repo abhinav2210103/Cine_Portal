@@ -37,8 +37,9 @@ export default function Page() {
         return;
     const [questions, setQuestions] = useState<QuestionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [remainTime, setRemainTime] = useState<number>(0);
-    const router = useRouter();
+    const [remainTime, setRemainTime] = useState<number>(0)
+    const [fullScreen, setFullScreen] = useState<boolean>(window.innerHeight > window.outerHeight);
+    const router = useRouter()
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java']);
     const [activeMenu, setActiveMenu] = useState<number>(0);
     const [subject, setSubject] = useState<string>("HTML");
@@ -63,21 +64,33 @@ export default function Page() {
     };
 
     const buttonHandler = async (state: string) => {
-        let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;        
-        if (state === "NA") {
-            changeState(state, 0);
-            const userId = localStorage.getItem("userId");
-            if (userId) {
-                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, 0, 0);
+        let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;
+        console.log("Current Answer:", answer);
+        const userId = localStorage.getItem("userId");
+
+        if(answer == "" && state == "NA" ){
+            if(allQuestions[activeQuestionNumber - 1]?.state !== "A" && allQuestions[activeQuestionNumber - 1]?.state !== "MR" ){
+                changeState(state, 0);
+                if (userId && allQuestions[activeQuestionNumber - 1]?.state != "NA") {
+                    await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
+                }
             }
-            setAnswer(""); 
-            return; 
+            else{
+                toast.error("Response already recorded!");
+            }
         }
+
+        if(ansId != 0 && state == "A" && allQuestions[activeQuestionNumber - 1]?.state == "MR"){
+            changeState(state, ansId);
+            if (userId) {
+                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), ansId);
+            }
+        }
+
         for (const option of allQuestions[activeQuestionNumber - 1].options) {
             if (option.desc === answer) {
                 ansId = option.id;
                 changeState(state, state === "NA" ? 0 : ansId);
-                const userId = localStorage.getItem("userId");
                 if (userId) {
                     await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
                 }
@@ -89,7 +102,7 @@ export default function Page() {
             return;
         }
     };
-    
+
 
     const clearResponseHandler = () => {
         const currentState: string = allQuestions[activeQuestionNumber - 1]?.state;
@@ -110,7 +123,16 @@ export default function Page() {
             return;
         }
         let language = await languageFetcher(userId);
-        setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language]);
+        console.log(language)
+        if (language == undefined) {
+            if (typeof window == undefined)
+                return;
+            localStorage.removeItem("userId");
+            localStorage.removeItem("language");
+            localStorage.removeItem("TREM");
+            router.push("/login")
+        }
+        setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language])
         if (typeof window == undefined)
             return;
         localStorage.setItem("language", language);
@@ -133,6 +155,9 @@ export default function Page() {
         const handleResize = () => {
             if (window.innerHeight < window.outerHeight) {
                 toast.error("Full screen mode is compulsory, exiting full screen can result in disqualification")
+            }
+            else {
+                setFullScreen(true);
             }
         };
 
@@ -158,6 +183,9 @@ export default function Page() {
                 event.preventDefault();
             }
         };
+        const handleBlur = () => {
+            toast.error("Tab switching detected. Please stay on the exam page.");
+        };
 
         const disableKeydown = (event: KeyboardEvent) => {
             if (event.ctrlKey || event.altKey || event.metaKey) {
@@ -168,7 +196,7 @@ export default function Page() {
         const disableContextMenu = (event: MouseEvent) => {
             event.preventDefault();
         };
-
+        window.addEventListener('blur', handleBlur);
         window.addEventListener('keydown', disableTabChange);
         window.addEventListener('keydown', disableKeydown);
         window.addEventListener('contextmenu', disableContextMenu);
@@ -177,13 +205,14 @@ export default function Page() {
             window.removeEventListener('keydown', disableTabChange);
             window.removeEventListener('keydown', disableKeydown);
             window.removeEventListener('contextmenu', disableContextMenu);
+            window.removeEventListener('blur', handleBlur);
         };
     }, []);
 
-    useEffect(() => {
+    useEffect(() => {6
 
         if (typeof window == undefined)
-            return
+            return;
         if (localStorage.getItem("userId") == null) {
             router.replace("/login");
         }
@@ -195,7 +224,7 @@ export default function Page() {
     }, []);
 
     return (
-        <div><Toaster />{loading ? <Loader /> : <div className='bg-[#EAEEFF] h-screen relative'>
+        <div><Toaster />{loading ? <Loader /> : fullScreen ? <div className='bg-[#EAEEFF] h-screen relative'>
 
             <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
                 <div className='flex justify-center items-center'>
@@ -211,36 +240,37 @@ export default function Page() {
                     <div key={id} className={`w-[120px] shadow-md hover:text-white font-medium mt-5 hover:bg-[#546CFF] cursor-pointer ${activeMenu == id ? "bg-[#546CFF] text-white" : "bg-white text-black"} flex justify-center items-center px-10 py-2  mx-[2px] transition-all duration-500 ${id == 0 ? "rounded-l-lg" : null} ${id == 4 ? "rounded-r-lg" : null}`} onClick={() => {
                         setSubject(navMenu[id])
                         setActiveMenu(id)
+                        dispatch(setActiveQuestionNumber(id*10+1));
                     }}>{element}</div>
                 ))}
             </div>
             <div className='w-[94%] mt-8 m-auto flex justify-between items-center'>
-                <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10'>
+                <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 relative'>
                     <h1 className='text-3xl font-bold py-6'>Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}</h1>
                     <hr />
                     <h1 className='font-semibold text-xl py-2'><pre className='w-3/4 whitespace-pre-wrap break-words overflow-auto'>{allQuestions[activeQuestionNumber - 1]?.question}</pre></h1>
                     {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
                         <div key={id} className='my-4 cursor-pointer'>
-                            <input 
-                                type="radio" 
-                                id={`opt${activeQuestionNumber}-${id}`} 
+                            <input
+                                type="radio"
+                                id={`opt${activeQuestionNumber}-${id}`}
                                 checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
                                 onChange={() => {
                                     console.log("Answer:", i.desc, " " + i.id);
-                                    setAnswer(i.desc);                                    
+                                    setAnswer(i.desc);
                                 }}
-                                name={`opt${activeQuestionNumber}`} 
+                                name={`opt${activeQuestionNumber}`}
                             />
-                            <label 
-                                className='ml-2 text-[17px] font-medium cursor-pointer' 
-                                htmlFor={`opt${activeQuestionNumber}-${id}`} 
+                            <label
+                                className='ml-2 text-[17px] font-medium cursor-pointer'
+                                htmlFor={`opt${activeQuestionNumber}-${id}`}
                             >
                                 {i.desc}
                             </label>
                         </div>
                     ))}
 
-                    <div className='mt-[19vh]'>
+                    <div className='bottom-7 absolute'>
                         <button className='bg-yellow-500 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("MR")}>Mark for Review & Next</button>
                         <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("A")}>Save & Next</button>
                         <button className='bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("NA")}>Skip</button>
@@ -265,6 +295,8 @@ export default function Page() {
                 </div>
             </div>
             <Image src="./icons/bg_logo.svg" alt="bgLogo" priority width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
-        </div>}</div>
+        </div> : <div className='flex justify-center items-center w-full h-screen text-xl font-bold'>Please do the Full Screen Mode to Start!</div>}</div>
     )
 }
+
+
