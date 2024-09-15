@@ -222,7 +222,7 @@ export default function Page() {
     }, []);
 
     return (
-        <div><Toaster />{loading ? <Loader /> : fullScreen ? <div className='bg-[#EAEEFF] h-screen relative'>
+        <div><Toaster />{loading ? <Loader /> : fullScreen ? <div className='bg-[#EAEEFF] select-none h-screen relative'>
 
             <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
                 <div className='flex justify-center items-center'>
