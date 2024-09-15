@@ -73,13 +73,14 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
                     onChange={handleChange}
                     placeholder="START"
                 />
-                <button
-                    disabled={!(start === "START" && isChecked && selectedLanguage) || loading}
-                    onClick={handleStart}
-                    className={`${!(start === "START" && isChecked && selectedLanguage) || loading ? 'bg-gray-300 text-gray-600' : 'bg-[#546CFF] text-white'} w-[22%] rounded-xl p-2 pl-5 pr-5 ml-4 text-lg`}
-                >
-                    {loading ? <ClipLoader color="blue" size={24} /> : 'Start'}
-                </button>
+<button
+    disabled={!(start === "START" && isChecked && selectedLanguage !== "") || loading}
+    onClick={handleStart}
+    className={`${!(start === "START" && isChecked && selectedLanguage !== "") || loading ? 'bg-gray-300 text-gray-600' : 'bg-[#546CFF] text-white'} w-[22%] rounded-xl p-2 pl-5 pr-5 ml-4 text-lg`}
+>
+    {loading ? <ClipLoader color="blue" size={24} /> : 'Start'}
+</button>
+
             </div>
         </>
     );
