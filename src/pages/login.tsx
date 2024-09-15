@@ -13,6 +13,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+
 export default function Login(): React.ReactElement {
   return (
     <GoogleReCaptchaProvider
@@ -33,13 +34,16 @@ const LoginComponent = () => {
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window == undefined)
-      return
-    const userId = localStorage.getItem("userId")
+    if (typeof window === "undefined") return;
+    const userId = localStorage.getItem("userId");
     const trem = localStorage.getItem("TREM");
-    if (userId != undefined) {
-      router.replace("/start")
+    const language = localStorage.getItem("language");
+    if (userId && !language) {
+      router.replace("/instructions");
+    } else if (userId && language) {
+      router.replace("/start");
     }
+
     const Backgroundimage = new Image();
     Backgroundimage.src = "./cine-bg.png";
     Backgroundimage.onload = () => {
@@ -68,6 +72,7 @@ const LoginComponent = () => {
           console.error("ReCAPTCHA not available");
           return;
         }
+        console.log("ok")
         const token = await executeRecaptcha("Login");
         const response = await fetch(
           `${baseurl}/student/login`,
@@ -80,6 +85,7 @@ const LoginComponent = () => {
             credentials: "include",
           }
         );
+        console.log(response);
         if (!response.ok) {
           console.log("API call error response:", response);
           if (response.status === 400) {
@@ -98,29 +104,35 @@ const LoginComponent = () => {
             "Content-Type": "application/json",
           },
           credentials: "include",
-        })
-        let flag = false;
-        try {
-          const prefererce = await fetch(`${baseurl}/student/getPreference?userId=${data.userId}`, {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            credentials: "include",
-          })
-          flag = true;
-        } catch (e) {
-          null
-        }
-        const timeData = await timeResponse.json()
-        console.log(timeData.remainingTime)
+        });
+        const timeData = await timeResponse.json();
+
         if (typeof window != undefined)
           localStorage.setItem("TREM", timeData.remainingTime);
+
         resetForm();
-        if (timeData.remainingTime == "10800000" && flag)
+
+        const preferenceResponse = await fetch(`${baseurl}/student/getPreference?userId=${data.userId}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        });
+        const preferenceData = await preferenceResponse.json();
+
+        if (preferenceData.message === "Invalid preference number") {
+          console.log(preferenceData.message)
           router.push("/instructions");
-        else
-          router.push("/start")
+        } else {
+            router.push("/start")
+        }
+
+          // if (timeData.remainingTime == "10800000")
+          //   router.push("/instructions");
+          // else
+          //   router.push("/start");
+
       } catch (error) {
         console.error("Login failed:", error);
         toast.error("Login failed");
@@ -186,7 +198,7 @@ const LoginComponent = () => {
                     Password:
                   </label>
                   <div className="border-2 border-black py-3 px-2 rounded-lg flex gap-2 w-[20rem] justify-evenly">
-                    <div>
+                    <div className="ml-2">
                       <FaKey size={24} />
                     </div>
                     <input
@@ -197,7 +209,7 @@ const LoginComponent = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.password}
-                      className="bg-transparent border-none outline-none"
+                      className="bg-transparent border-none outline-none w-[17rem] focus:bg-transparent"
                     />
                     <div className="cursor-pointer" onClick={togglePassword}>
                       {passwordVisible ? (

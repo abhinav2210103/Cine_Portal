@@ -1,5 +1,5 @@
-'use client'
-import React, { useEffect, useState } from 'react'
+'use client';
+import React, { useEffect, useState } from 'react';
 import { QuesNoCard } from '@/components/QuesNoCard';
 import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
@@ -11,104 +11,124 @@ import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
 import { responseFetcher } from '@/constants/responseFetcher';
 import { responseSetter } from '@/constants/responseSetter';
-import { useParams, useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Timer from '@/components/Timer';
 import { languageFetcher } from '@/constants/languageFetcher';
 
-interface option {
+interface Option {
     desc: string,
     id: number,
 }
 
-interface questionType {
+interface QuestionType {
     _id: string,
     state: string,
     quesId: number,
     subject: string,
     question: string,
-    options: option[],
+    options: Option[],
     recordedAns: number,
     answer: number
 }
 
-export default function page() {
-    const query = useParams()
+export default function Page() {
+    const query = useParams();
     if (typeof window == undefined)
         return;
-    const [questions, setQuestions] = useState<questionType[]>([]);
+    const [questions, setQuestions] = useState<QuestionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [remainTime, setRemainTime] = useState<number>(0)
-    const [fullScreen, setFullScreen] = useState<boolean>(true);
+    const [fullScreen, setFullScreen] = useState<boolean>(window.innerHeight > window.outerHeight);
     const router = useRouter()
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java']);
-    const [activeMenu, setActiveMenu] = useState<number>(0)
-    const [subject, setSubject] = useState<string>("HTML")
+    const [activeMenu, setActiveMenu] = useState<number>(0);
+    const [subject, setSubject] = useState<string>("HTML");
     const dispatch = useDispatch();
     const activeQuestionNumber = useSelector((state: RootState) => state.question.activeQuestionNumber);
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const [idx, setIdx] = useState<number>(activeQuestionNumber);
-    const [answer, setAnswer] = useState<string>("")
+    const [answer, setAnswer] = useState<string>("");
+
     const changeState = (type: string, ansId: number) => {
-        let temp: questionType[] = []
-        allQuestions.forEach((element, id) => {
-            id + 1 == activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element)
+        // let temp: QuestionType[] = [];
+        // allQuestions.forEach((element, id) => {
+        //     id + 1 === activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element);
+        // });
+        let temp = allQuestions.map((element, id) => {
+            if (id + 1 === activeQuestionNumber) {
+                return { ...element, state: type, recordedAns: ansId };
+            }
+            return element;
         });
-        if (activeQuestionNumber == allQuestions.length) {
-            dispatch(setActiveQuestionNumber(1))
+        if (activeQuestionNumber === allQuestions.length) {
+            dispatch(setActiveQuestionNumber(1));
+        } else {
+            setActiveMenu(Math.floor(allQuestions[activeQuestionNumber].quesId / 100) - 1);
+            dispatch(setActiveQuestionNumber(activeQuestionNumber + 1));
         }
-        else {
-            setActiveMenu(Math.floor(allQuestions[activeQuestionNumber].quesId / 100) - 1)
-            dispatch(setActiveQuestionNumber(activeQuestionNumber + 1))
-        }
-        dispatch(setQuestionsState(temp))
-    }
+        dispatch(setQuestionsState(temp));
+    };
 
     const buttonHandler = async (state: string) => {
         let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;
-        if (["NA", "MR", "A"].indexOf(state) < ["NA", "MR", "A"].indexOf(allQuestions[activeQuestionNumber - 1].state)) {
-            toast.error("Already saved and recorded")
-            return
-        }
-        if (typeof window == undefined)
-            return
+        console.log("Current Answer:", answer);
         const userId = localStorage.getItem("userId");
-        if (userId == null)
-            return;
-        for (const option of allQuestions[activeQuestionNumber - 1].options) {
-            if (option.desc == answer) {
-                ansId = option.id
-                changeState(state, state == "NA" ? 0 : ansId)
-                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
-                setAnswer("")
+
+        if(answer == "" && state == "NA" ){
+            if(allQuestions[activeQuestionNumber - 1]?.state !== "A" && allQuestions[activeQuestionNumber - 1]?.state !== "MR" ){
+                changeState(state, 0);
+                if (userId && allQuestions[activeQuestionNumber - 1]?.state != "NA") {
+                    await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
+                }
+            }
+            else{
+                toast.error("Response already recorded!");
             }
         }
-        if (ansId == 0 && state != "NA") {
-            toast.error("Please select an answer")
-            return
+
+        if(ansId != 0 && state == "A" && allQuestions[activeQuestionNumber - 1]?.state == "MR"){
+            changeState(state, ansId);
+            if (userId) {
+                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), ansId);
+            }
         }
-        changeState(state, state == "NA" ? 0 : ansId)
-        await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state == "NA" ? 0 : ansId)
-    }
+
+        for (const option of allQuestions[activeQuestionNumber - 1].options) {
+            console.log("Checking option:", option);
+            if (option.desc === answer) {
+                ansId = option.id;
+                changeState(state, state === "NA" ? 0 : ansId);
+                if (userId) {
+                    await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
+                }
+                setAnswer("");
+            }
+        }
+
+        if (ansId === 0 && state !== "NA") {
+            toast.error("Please select an answer");
+            return;
+        }
+    };
 
 
     const clearResponseHandler = () => {
-        const currentState: string = allQuestions[activeQuestionNumber - 1]?.state
-        if (currentState != "A" && currentState != "MR") {
+        const currentState: string = allQuestions[activeQuestionNumber - 1]?.state;
+        if (currentState !== "A" && currentState !== "MR") {
             setAnswer("");
+        } else {
+            toast.error("Already saved and recorded");
         }
-        else {
-            toast.error("Already saved and recorded")
-        }
-    }
+    };
 
     const getQuestions = async () => {
         if (typeof window == undefined)
             return
-        const userId = localStorage.getItem("userId")
-        if (userId == null) {
-            toast.error("User not found")
-            router.replace("/login")
-            return
+        const userId = localStorage.getItem("userId");
+        if (!userId) {
+            toast.error("User not found");
+            router.replace("/login");
+            return;
         }
         let language = await languageFetcher(userId);
         console.log(language)
@@ -125,19 +145,18 @@ export default function page() {
             return;
         localStorage.setItem("language", language);
         let responses = await responseFetcher(userId);
-        console.log(responses)
         if (responses?.message) {
-            router.replace("/login")
-            return
+            router.replace("/login");
+            return;
         }
-        let data: questionType[] = [];
+        let data: QuestionType[] = [];
         for (let i = 0; i < navMenu.length; i++) {
-            let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language], ['HTML', 'SQL', 'CSS', 'Aptitude', language][i], userId, responses)
+            let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language], ['HTML', 'SQL', 'CSS', 'Aptitude', language][i], userId, responses);
             data = [...data, ...temp];
         }
-        dispatch(setQuestionsState(data))
-        setLoading(false)
-    }
+        dispatch(setQuestionsState(data));
+        setLoading(false);
+    };
 
 
     useEffect(() => {
@@ -146,7 +165,7 @@ export default function page() {
                 toast.error("Full screen mode is compulsory, exiting full screen can result in disqualification")
             }
             else {
-                setFullScreen(false);
+                setFullScreen(true);
             }
         };
 
@@ -157,6 +176,7 @@ export default function page() {
         };
     }, []);
 
+
     useEffect(() => {
         function BeforeUnloadHandler(event: BeforeUnloadEvent) {
             event.preventDefault();
@@ -166,21 +186,53 @@ export default function page() {
     }, [])
 
     useEffect(() => {
+        const disableTabChange = (event: KeyboardEvent) => {
+            if (event.ctrlKey && (event.key === 'Tab' || event.key === 't' || event.key === 'T')) {
+                event.preventDefault();
+            }
+        };
+        const handleBlur = () => {
+            toast.error("Tab switching detected. Please stay on the exam page.");
+        };
+
+        const disableKeydown = (event: KeyboardEvent) => {
+            if (event.ctrlKey || event.altKey || event.metaKey) {
+                event.preventDefault();
+            }
+        };
+
+        const disableContextMenu = (event: MouseEvent) => {
+            event.preventDefault();
+        };
+        window.addEventListener('blur', handleBlur);
+        window.addEventListener('keydown', disableTabChange);
+        window.addEventListener('keydown', disableKeydown);
+        window.addEventListener('contextmenu', disableContextMenu);
+
+        return () => {
+            window.removeEventListener('keydown', disableTabChange);
+            window.removeEventListener('keydown', disableKeydown);
+            window.removeEventListener('contextmenu', disableContextMenu);
+            window.removeEventListener('blur', handleBlur);
+        };
+    }, []);
+
+    useEffect(() => {6
 
         if (typeof window == undefined)
-            return
+            return;
         if (localStorage.getItem("userId") == null) {
-            router.replace("/login")
+            router.replace("/login");
         }
         if (localStorage.getItem("TREM") != null) {
-            let data: number = parseInt(localStorage.getItem("TREM") || "0")
-            setRemainTime(data)
+            let data: number = parseInt(localStorage.getItem("TREM") || "0");
+            setRemainTime(data);
         }
-        getQuestions()
-    }, [])
+        getQuestions();
+    }, []);
 
     return (
-        <div><Toaster />{loading ? <Loader /> : !fullScreen ? <div className='bg-[#EAEEFF] h-screen relative'>
+        <div><Toaster />{loading ? <Loader /> : fullScreen ? <div className='bg-[#EAEEFF] h-screen relative'>
 
             <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
                 <div className='flex justify-center items-center'>
@@ -196,24 +248,37 @@ export default function page() {
                     <div key={id} className={`w-[120px] shadow-md hover:text-white font-medium mt-5 hover:bg-[#546CFF] cursor-pointer ${activeMenu == id ? "bg-[#546CFF] text-white" : "bg-white text-black"} flex justify-center items-center px-10 py-2  mx-[2px] transition-all duration-500 ${id == 0 ? "rounded-l-lg" : null} ${id == 4 ? "rounded-r-lg" : null}`} onClick={() => {
                         setSubject(navMenu[id])
                         setActiveMenu(id)
+                        dispatch(setActiveQuestionNumber(id*10+1));
                     }}>{element}</div>
                 ))}
             </div>
             <div className='w-[94%] mt-8 m-auto flex justify-between items-center'>
-                <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10'>
+                <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 relative'>
                     <h1 className='text-3xl font-bold py-6'>Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}</h1>
                     <hr />
-                    <h1 className='font-semibold text-xl py-2'><pre className='w-[100px]'>{allQuestions[activeQuestionNumber - 1]?.question}</pre></h1>
+                    <h1 className='font-semibold text-xl py-2'><pre className='w-3/4 whitespace-pre-wrap break-words overflow-auto'>{allQuestions[activeQuestionNumber - 1]?.question}</pre></h1>
                     {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
-                        <div key={id} className='my-4 cursor-pointer' >
-                            <input type="radio" checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
+                        <div key={id} className='my-4 cursor-pointer'>
+                            <input
+                                type="radio"
+                                id={`opt${activeQuestionNumber}-${id}`}
+                                checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
                                 onChange={() => {
-                                    setAnswer(i.desc)
-                                }} name={`opt${activeQuestionNumber}${i.id}`} id={`opt${activeQuestionNumber}${i.id}`} />
-                            <label className='ml-2 text-[17px] font-medium cursor-pointer' htmlFor={`opt${activeQuestionNumber}${i.id}`}>{i.desc}</label>
+                                    console.log("Answer:", i.desc, " " + i.id);
+                                    setAnswer(i.desc);
+                                }}
+                                name={`opt${activeQuestionNumber}`}
+                            />
+                            <label
+                                className='ml-2 text-[17px] font-medium cursor-pointer'
+                                htmlFor={`opt${activeQuestionNumber}-${id}`}
+                            >
+                                {i.desc}
+                            </label>
                         </div>
                     ))}
-                    <div className='mt-[19vh]'>
+
+                    <div className='bottom-7 absolute'>
                         <button className='bg-yellow-500 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("MR")}>Mark for Review & Next</button>
                         <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("A")}>Save & Next</button>
                         <button className='bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("NA")}>Skip</button>
