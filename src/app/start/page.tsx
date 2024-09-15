@@ -50,15 +50,9 @@ export default function Page() {
     const [answer, setAnswer] = useState<string>("");
 
     const changeState = (type: string, ansId: number) => {
-        // let temp: QuestionType[] = [];
-        // allQuestions.forEach((element, id) => {
-        //     id + 1 === activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element);
-        // });
-        let temp = allQuestions.map((element, id) => {
-            if (id + 1 === activeQuestionNumber) {
-                return { ...element, state: type, recordedAns: ansId };
-            }
-            return element;
+        let temp: QuestionType[] = [];
+        allQuestions.forEach((element, id) => {
+            id + 1 === activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element);
         });
         if (activeQuestionNumber === allQuestions.length) {
             dispatch(setActiveQuestionNumber(1));
@@ -94,7 +88,6 @@ export default function Page() {
         }
 
         for (const option of allQuestions[activeQuestionNumber - 1].options) {
-            console.log("Checking option:", option);
             if (option.desc === answer) {
                 ansId = option.id;
                 changeState(state, state === "NA" ? 0 : ansId);
@@ -104,7 +97,6 @@ export default function Page() {
                 setAnswer("");
             }
         }
-
         if (ansId === 0 && state !== "NA") {
             toast.error("Please select an answer");
             return;

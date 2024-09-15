@@ -85,10 +85,16 @@ const LoginComponent = () => {
             credentials: "include",
           }
         );
-        console.log(response);
+        const responseData = await response.json(); 
+        if( responseData.message === "Test already submitted") {
+          toast.error("Test already submitted. Please contact the invigilator.");
+          setDisabled(false);
+          return;
+        }
         if (!response.ok) {
           console.log("API call error response:", response);
           if (response.status === 400) {
+            
             toast.error("Invalid credentials. Please try again.");
           } else {
             toast.error("An unexpected error occurred. Please try again later.");
