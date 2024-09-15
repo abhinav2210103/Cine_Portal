@@ -159,6 +159,9 @@ export default function Page() {
                 event.preventDefault();
             }
         };
+        const handleBlur = () => {
+            toast.error("Tab switching detected. Please stay on the exam page.");
+        };
 
         const disableKeydown = (event: KeyboardEvent) => {
             if (event.ctrlKey || event.altKey || event.metaKey) {
@@ -169,7 +172,7 @@ export default function Page() {
         const disableContextMenu = (event: MouseEvent) => {
             event.preventDefault();
         };
-
+        window.addEventListener('blur', handleBlur);
         window.addEventListener('keydown', disableTabChange);
         window.addEventListener('keydown', disableKeydown);
         window.addEventListener('contextmenu', disableContextMenu);
@@ -178,6 +181,7 @@ export default function Page() {
             window.removeEventListener('keydown', disableTabChange);
             window.removeEventListener('keydown', disableKeydown);
             window.removeEventListener('contextmenu', disableContextMenu);
+            window.removeEventListener('blur', handleBlur);
         };
     }, []);
 
