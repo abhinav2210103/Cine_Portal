@@ -32,21 +32,17 @@ interface QuestionType {
 }
 
 export default function Page() {
-    const query = useParams();
     if (typeof window == undefined)
         return;
-    const [questions, setQuestions] = useState<QuestionType[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [remainTime, setRemainTime] = useState<number>(0)
     const [fullScreen, setFullScreen] = useState<boolean>(window.innerHeight > window.outerHeight);
     const router = useRouter()
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java']);
     const [activeMenu, setActiveMenu] = useState<number>(0);
-    const [subject, setSubject] = useState<string>("HTML");
     const dispatch = useDispatch();
     const activeQuestionNumber = useSelector((state: RootState) => state.question.activeQuestionNumber);
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
-    const [idx, setIdx] = useState<number>(activeQuestionNumber);
     const [answer, setAnswer] = useState<string>("");
 
     const changeState = (type: string, ansId: number) => {
@@ -106,7 +102,7 @@ export default function Page() {
     const clearResponseHandler = () => {
         const currentState: string = allQuestions[activeQuestionNumber - 1]?.state;
         if (currentState !== "A" && currentState !== "MR") {
-            setAnswer("");
+            setAnswer("");            
         } else {
             toast.error("Already saved and recorded");
         }
@@ -207,7 +203,7 @@ export default function Page() {
         };
     }, []);
 
-    useEffect(() => {6
+    useEffect(() => {
 
         if (typeof window == undefined)
             return;
@@ -245,34 +241,42 @@ export default function Page() {
             <div className='w-[94%] mt-8 m-auto flex justify-between items-center'>
                 <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 relative'>
                     <div className='overflow-y-auto h-[calc(100%-80px)]'>                    
-                        <h1 className='text-3xl font-bold py-6'>Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}</h1>
-                        <hr />
-                        <h1 className='font-semibold text-xl py-2'>
-                            <pre className='w-3/4 whitespace-pre-wrap break-words'>{allQuestions[activeQuestionNumber - 1]?.question}</pre>
+                        <h1 className='text-2xl sm:text-3xl font-medium py-6 font-text-me-one text-gray-500'>
+                        Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}
                         </h1>
+                        <hr className='border-t border-gray-300' />
+                        <p className='font-extrabold lg:text-lg xl:text-xl md:text-base sm:text-lg py-2 font-text-me-one text-gray-700'>
+                        <pre className='w-full sm:w-3/4 whitespace-pre-wrap break-words leading-6'>
+                            {allQuestions[activeQuestionNumber - 1]?.question}
+                        </pre>
+                        </p>
                         {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
-                            <div key={id} className='my-4 cursor-pointer'>
-                                <input
-                                    type="radio"
-                                    id={`opt${activeQuestionNumber}-${id}`}
-                                    checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 ? answer != "" ? answer == i.desc : allQuestions[activeQuestionNumber - 1].recordedAns == i.id : answer == i.desc}
-                                    onChange={() => { setAnswer(i.desc); }}
-                                    name={`opt${activeQuestionNumber}`}
-                                />
-                                <label
-                                    className='ml-2 text-[17px] font-medium cursor-pointer'
-                                    htmlFor={`opt${activeQuestionNumber}-${id}`}
-                                >
-                                    {i.desc}
-                                </label>
-                            </div>
+                        <div key={id} className='my-4 cursor-pointer'>
+                            <input
+                            type="radio"
+                            id={`opt${activeQuestionNumber}-${id}`}
+                            checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 
+                                ? answer !== "" 
+                                ? answer === i.desc 
+                                : allQuestions[activeQuestionNumber - 1].recordedAns === i.id 
+                                : answer === i.desc}
+                            onChange={() => { setAnswer(i.desc); }}
+                            name={`opt${activeQuestionNumber}`}
+                            />
+                            <label
+                            className='ml-2 text-[16px] sm:text-[17px] md:text-lg lg:text-xl  font-normal cursor-pointer font-text-me-one text-gray-700'
+                            htmlFor={`opt${activeQuestionNumber}-${id}`}
+                            >
+                            {i.desc}
+                            </label>
+                        </div>
                         ))}
                     </div>
                     <div className='absolute bottom-7'>
                         <button className='bg-yellow-500 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("MR")}>Mark for Review & Next</button>
                         <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("A")}>Save & Next</button>
                         <button className='bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("NA")}>Skip</button>
-                        <button className='bg-white outline outline-1 outline-black mx-2 rounded-xl px-4 py-[10px] text-sm text-black font-medium' onClick={clearResponseHandler}>Clear Response</button>
+                        <button className='bg-white outline outline-1 outline-black mx-2 rounded-xl px-4 py-[10px] text-sm text-black font-medium' onClick={clearResponseHandler}>Clear Response</button>   
                     </div>
                 </div>
 

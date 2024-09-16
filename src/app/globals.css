@@ -2,6 +2,10 @@
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
+
+:root {
+    --font-text-me-one: "Text Me One", sans-serif;
+  }
 * {
     font-family: "Poppins";
 }

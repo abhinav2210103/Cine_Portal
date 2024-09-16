@@ -137,9 +137,9 @@ const LoginComponent = () => {
           // else
           //   router.push("/start");
 
-      } catch (error) {
-        console.error("Login failed:", error);
-        toast.error("Login failed");
+      } catch (error : any ) {
+        // console.log(error)
+        // toast.error("Login failed");
       } finally {
         setDisabled(false);
       }

@@ -76,12 +76,11 @@ export default function Page() {
         if (!submitResponse.ok) {
           throw new Error('Network error');
         }
-        const data = await response.json();
         router.replace("/thankyou")
         setLoading(false);
       } catch (error) {
         setLoading(false);
-        console.error('Error submitting feedback:', error);
+        // console.error('Error submitting feedback:', error);
       }
     }
   };
