@@ -39,6 +39,7 @@ export default function Page() {
     const [fullScreen, setFullScreen] = useState<boolean>(window.innerHeight > window.outerHeight);
     const router = useRouter()
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java']);
+    const [subject, setSubject] = useState<string>('HTML'); 
     const [activeMenu, setActiveMenu] = useState<number>(0);
     const dispatch = useDispatch();
     const activeQuestionNumber = useSelector((state: RootState) => state.question.activeQuestionNumber);
