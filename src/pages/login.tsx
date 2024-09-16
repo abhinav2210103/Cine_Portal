@@ -10,6 +10,7 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { useRouter } from "next/router";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Loader from "@/components/Loader/Loader";
 
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
@@ -32,6 +33,24 @@ const LoginComponent = () => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState<boolean>(false);
   const router = useRouter();
+
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const checkDeviceView = () => {
+        if (window.innerWidth < 768 || window.innerHeight > window.innerWidth) {
+          router.replace("/error");
+        }
+      };
+
+      checkDeviceView(); 
+      window.addEventListener("resize", checkDeviceView);
+      return () => {
+        window.removeEventListener("resize", checkDeviceView);
+      };
+    }
+  }, [router]);
+
 
   useEffect(() => {
     if (typeof window === "undefined") return;

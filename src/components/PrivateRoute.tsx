@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useEffect, ReactNode, useState } from 'react';
 
 interface PrivateRouteProps {
@@ -9,26 +9,36 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const router = useRouter();
+  const pathname = usePathname();
   const [isClient, setIsClient] = useState(false);
 
   useEffect(() => {
-    // Only run when mounted on the client
     if (typeof window !== "undefined") {
       setIsClient(true);
-      const userId = localStorage.getItem('userId');
 
-      if (!userId) {
-        router.replace('/login');
-      }
+      const checkDeviceView = () => {
+        if (window.innerWidth < 768 || window.innerHeight > window.innerWidth) {
+          router.replace("/error");
+        } else {
+          const userId = localStorage.getItem('userId');
+          if (!userId) {
+            router.replace('/login');
+          }
+        }
+      };
+
+      checkDeviceView();
+      window.addEventListener("resize", checkDeviceView);
+      return () => {
+        window.removeEventListener("resize", checkDeviceView);
+      };
     }
   }, [router]);
-
   if (!isClient) {
-    return null; 
+    return null;
   }
-
   const userId = localStorage.getItem('userId');
-  if(!userId) return ; 
+  if(!userId) return ;
   return userId ? <>{children}</> : null;
 };
 
