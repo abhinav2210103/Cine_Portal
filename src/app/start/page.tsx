@@ -246,11 +246,11 @@ export default function Page() {
                         Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}
                         </h1>
                         <hr className='border-t border-gray-300' />
-                        <p className='font-extrabold lg:text-lg xl:text-xl md:text-base sm:text-lg py-2 font-text-me-one text-gray-700'>
+                        <h1 className='font-extrabold lg:text-lg xl:text-xl md:text-base sm:text-lg py-2 font-text-me-one text-gray-700'>
                         <pre className='w-full sm:w-3/4 whitespace-pre-wrap break-words leading-6'>
                             {allQuestions[activeQuestionNumber - 1]?.question}
                         </pre>
-                        </p>
+                        </h1>
                         {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
                         <div key={id} className='my-4 cursor-pointer'>
                             <input
