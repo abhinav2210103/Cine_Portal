@@ -11,7 +11,7 @@ import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
 import { responseFetcher } from '@/constants/responseFetcher';
 import { responseSetter } from '@/constants/responseSetter';
-import { useParams, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Timer from '@/components/Timer';
 import { languageFetcher } from '@/constants/languageFetcher';
 
@@ -31,6 +31,11 @@ interface QuestionType {
     answer: number
 }
 
+const Spinner = ({ color } : { color : string }) => (
+    <div className={`spinner-border animate-spin inline-block w-4 h-4 border-2 border-t-transparent border-${color} rounded-full`}></div>
+);
+
+
 export default function Page() {
     if (typeof window == undefined)
         return;
@@ -39,12 +44,12 @@ export default function Page() {
     const [fullScreen, setFullScreen] = useState<boolean>(window.innerHeight > window.outerHeight);
     const router = useRouter()
     const [navMenu, setNavMenu] = useState<string[]>(['HTML', 'SQL', 'CSS', 'Aptitude', 'Java']);
-    const [subject, setSubject] = useState<string>('HTML'); 
     const [activeMenu, setActiveMenu] = useState<number>(0);
     const dispatch = useDispatch();
     const activeQuestionNumber = useSelector((state: RootState) => state.question.activeQuestionNumber);
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const [answer, setAnswer] = useState<string>("");
+    const [loadingButton, setLoadingButton] = useState<string | null>(null);
 
     const changeState = (type: string, ansId: number) => {
         let temp: QuestionType[] = [];
@@ -61,54 +66,71 @@ export default function Page() {
     };
 
     const buttonHandler = async (state: string) => {
-        let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;
-        const userId = localStorage.getItem("userId");
-
-        if(answer == "" && state == "NA" ){
-            if(allQuestions[activeQuestionNumber - 1]?.state !== "A" && allQuestions[activeQuestionNumber - 1]?.state !== "MR" ){
-                changeState(state, 0);
-                if (userId && allQuestions[activeQuestionNumber - 1]?.state != "NA") {
-                    await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
+        setLoadingButton(state);  
+        let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;       
+        const userId = localStorage.getItem("userId");        
+        try {          
+            if(state === "A"  && allQuestions[activeQuestionNumber -1 ]?.state === "A" && answer === "" ) {
+                changeState("A", ansId) ; 
+                return ; 
+            }
+            if (state === "clear") {
+                const currentState: string = allQuestions[activeQuestionNumber - 1]?.state;
+                if (currentState === "A" || currentState === "MR") {
+                    if (userId) {
+                        await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf("NA"), 0);
+                    }
                 }
-            }
-            else{
-                toast.error("Response already recorded!");
-            }
-        }
-
-        if(ansId != 0 && state == "A" && allQuestions[activeQuestionNumber - 1]?.state == "MR"){
-            changeState(state, ansId);
-            if (userId) {
-                await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), ansId);
-            }
-        }
-
-        for (const option of allQuestions[activeQuestionNumber - 1].options) {
-            if (option.desc === answer) {
-                ansId = option.id;
-                changeState(state, state === "NA" ? 0 : ansId);
-                if (userId) {
-                    await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
-                }
+                changeState("NA", 0);
                 setAnswer("");
+                toast.success("Response Cleared");
+                return; 
             }
-        }
-        if (ansId === 0 && state !== "NA") {
-            toast.error("Please select an answer");
-            return;
-        }
-    };    
-
-
-    const clearResponseHandler = () => {
-        const currentState: string = allQuestions[activeQuestionNumber - 1]?.state;
-        if (currentState !== "A" && currentState !== "MR") {
-            setAnswer("");            
-        } else {
-            toast.error("Already saved and recorded");
+            if (answer === "" && state === "NA") {
+                if (allQuestions[activeQuestionNumber - 1]?.state !== "A" && allQuestions[activeQuestionNumber - 1]?.state !== "MR") {
+                    if (userId && allQuestions[activeQuestionNumber - 1]?.state != "NA") {
+                        await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), 0);
+                    }
+                    changeState(state, 0);
+                } else {
+                    toast.error("Response already recorded!");
+                }
+            }
+            if (state === "MR" && allQuestions[activeQuestionNumber - 1]?.state === "A") {
+                if (userId) {
+                    await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), ansId);
+                }
+                changeState(state, ansId); 
+            }
+            if(state === "MR"  && allQuestions[activeQuestionNumber -1 ]?.state === "MR" && answer === "" ) {
+                changeState("MR", ansId) ; 
+                return ; 
+            }
+            if (ansId != 0 && state === "A" && allQuestions[activeQuestionNumber - 1]?.state == "MR") {
+                if (userId) {
+                    await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), ansId);
+                }
+                changeState(state, ansId);
+            }
+    
+            for (const option of allQuestions[activeQuestionNumber - 1].options) {
+                if (option.desc === answer) {
+                    ansId = option.id;
+                    if (userId) {
+                        await responseSetter(userId, allQuestions[activeQuestionNumber - 1]._id, ["NA", "MR", "A"].indexOf(state), state === "NA" ? 0 : ansId);
+                    }
+                    setAnswer("");
+                    changeState(state, state === "NA" ? 0 : ansId);
+                }
+            }    
+            if (ansId === 0 && state !== "NA") {
+                toast.error("Please select an answer");
+                return;
+            }
+        } finally {
+            setLoadingButton(null);  
         }
     };
-
     const getQuestions = async () => {
         if (typeof window == undefined)
             return
@@ -155,9 +177,7 @@ export default function Page() {
                 setFullScreen(true);
             }
         };
-
         window.addEventListener('resize', handleResize);
-
         return () => {
             window.removeEventListener('resize', handleResize);
         };
@@ -205,9 +225,9 @@ export default function Page() {
     }, []);
 
     useEffect(() => {
-
         if (typeof window == undefined)
             return;
+        
         if (localStorage.getItem("userId") == null) {
             router.replace("/login");
         }
@@ -233,7 +253,6 @@ export default function Page() {
             <div className='flex ml-[50%] -translate-x-[50%]'>
                 {navMenu?.map((element, id) => (
                     <div key={id} className={`w-[120px] shadow-md hover:text-white font-medium mt-5 hover:bg-[#546CFF] cursor-pointer ${activeMenu == id ? "bg-[#546CFF] text-white" : "bg-white text-black"} flex justify-center items-center px-10 py-2  mx-[2px] transition-all duration-500 ${id == 0 ? "rounded-l-lg" : null} ${id == 4 ? "rounded-r-lg" : null}`} onClick={() => {
-                        setSubject(navMenu[id])
                         setActiveMenu(id)
                         dispatch(setActiveQuestionNumber(id*10+1));
                     }}>{element}</div>
@@ -274,10 +293,33 @@ export default function Page() {
                         ))}
                     </div>
                     <div className='absolute bottom-7'>
-                        <button className='bg-yellow-500 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("MR")}>Mark for Review & Next</button>
-                        <button className='bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("A")}>Save & Next</button>
-                        <button className='bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => buttonHandler("NA")}>Skip</button>
-                        <button className='bg-white outline outline-1 outline-black mx-2 rounded-xl px-4 py-[10px] text-sm text-black font-medium' onClick={clearResponseHandler}>Clear Response</button>   
+                        <button 
+                            className={`bg-purple-600 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium ${loadingButton && loadingButton !== "MR" ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                            onClick={() => !loadingButton && buttonHandler("MR")}
+                            disabled={loadingButton !== null && loadingButton !== "MR"}>
+                            {loadingButton === "MR" ? <Spinner color="white" /> : "Mark for Review & Next"}
+                        </button>
+                        
+                        <button 
+                            className={`bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium ${loadingButton && loadingButton !== "A" ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                            onClick={() => !loadingButton && buttonHandler("A")}
+                            disabled={loadingButton !== null && loadingButton !== "A"}>
+                            {loadingButton === "A" ? <Spinner color="white" /> : "Save & Next"}
+                        </button>
+                        
+                        <button 
+                            className={`bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium ${loadingButton && loadingButton !== "NA" ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                            onClick={() => !loadingButton && buttonHandler("NA")}
+                            disabled={loadingButton !== null && loadingButton !== "NA"}>
+                            {loadingButton === "NA" ? <Spinner color="white"/> : "Skip"}
+                        </button>
+                        
+                        <button 
+                            className={`bg-white outline outline-1 outline-black mx-2 rounded-xl px-4 py-[10px] text-sm text-black font-medium ${loadingButton && loadingButton !== "clear" ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                            onClick={() => !loadingButton && buttonHandler("clear")}
+                            disabled={loadingButton !== null && loadingButton !== "clear"}>
+                            {loadingButton === "clear" ? <Spinner  color="black"/> : "Clear Response"}
+                        </button>  
                     </div>
                 </div>
 
@@ -302,5 +344,3 @@ export default function Page() {
         </div> : <div className='flex justify-center items-center w-full h-screen text-xl font-bold'>Please do the Full Screen Mode to Start!</div>}</div>
     )
 }
-
-
