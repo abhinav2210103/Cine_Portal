@@ -22,15 +22,12 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
             }
         }
     }, []);
-
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setStart(event.target.value);
     };
-
     const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
         setIsChecked(event.target.checked);
     };
-
     const handleStart = async () => {
         if (selectedLanguage) {
             setLoading(true);
@@ -42,15 +39,8 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
                     },
                     body: JSON.stringify({ userId: userId, preference: parseInt(selectedLanguage) })
                 });
-                if(typeof window !== "undefined")  return ; 
-                localStorage.setItem('language', selectedLanguage);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const data = await response.json();
-                router.push('/start');
+                router.push('/start');                 
             } catch (error) {
-                // console.error('Error:', error);
             } finally {
                 setLoading(false);
             }
@@ -74,14 +64,13 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
                     onChange={handleChange}
                     placeholder="START"
                 />
-<button
-    disabled={!(start === "START" && isChecked && selectedLanguage !== "") || loading}
-    onClick={handleStart}
-    className={`${!(start === "START" && isChecked && selectedLanguage !== "") || loading ? 'bg-gray-300 text-gray-600' : 'bg-[#546CFF] text-white'} w-[22%] rounded-xl p-2 pl-5 pr-5 ml-4 text-lg`}
->
-    {loading ? <ClipLoader color="blue" size={24} /> : 'Start'}
-</button>
-
+            <button
+                disabled={!(start === "START" && isChecked && selectedLanguage !== "") || loading}
+                onClick={handleStart}
+                className={`${!(start === "START" && isChecked && selectedLanguage !== "") || loading ? 'bg-gray-300 text-gray-600' : 'bg-[#546CFF] text-white'} w-[22%] rounded-xl p-2 pl-5 pr-5 ml-4 text-lg`}
+            >
+                {loading ? <ClipLoader color="blue" size={24} /> : 'Start'}
+            </button>
             </div>
         </>
     );
