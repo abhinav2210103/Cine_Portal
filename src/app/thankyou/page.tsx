@@ -26,7 +26,7 @@ function page() {
                     
                         <div className='text-5xl font-medium text-center '>Thank you for completing the test! </div>
                        
-                        <div className='text-2xl mt-4 font-regular text-center'>We appreciate the time and effort you’ve put into it. </div>
+                        <div className='text-2xl mt-4 font-regular text-center'>We appreciate the time and effort you've put into it. </div>
                         <Image src="/clock.png" width={300} height={300} alt="clock" className='px-3 mt-16' />
                         <div className='text-xl mt-16 text-center font-regular'><i>Regardless of the outcome, keep pushing forward. Every experience brings you closer to success.</i></div>
                     </div>

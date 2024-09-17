@@ -22,7 +22,7 @@ export default function Timer(props: props) {
         resume,
         restart,
     } = useTimer({ expiryTimestamp: new Date(Date.now() + parseInt(localStorage.getItem("TREM") || "")), onExpire: async  () => {
-        if (typeof window == undefined)
+        if (typeof window === "undefined")
             return;
         const userId = localStorage.getItem("userId");
         if (!userId)
@@ -31,7 +31,7 @@ export default function Timer(props: props) {
         router.push("/feedback") ; 
     }});
     useEffect(() => {
-        if (typeof window == undefined)
+        if (typeof window === "undefined")
             return;
         const prevTime = parseInt(localStorage.getItem("TREM") || "");
         localStorage.setItem("TREM", `${prevTime - 1000}`);

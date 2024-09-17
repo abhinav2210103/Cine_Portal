@@ -118,7 +118,7 @@ const LoginComponent = () => {
           }
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        if (typeof window != undefined)
+        if (typeof window !== "undefined")
           localStorage.setItem('userId', data.userId);
         const timeResponse = await fetch(`${baseurl}/student/timeRemaining?userId=${data.userId}`, {
           method: "GET",
@@ -129,7 +129,7 @@ const LoginComponent = () => {
         });
         const timeData = await timeResponse.json();
 
-        if (typeof window != undefined)
+        if (typeof window !== "undefined")
           localStorage.setItem("TREM", timeData.remainingTime);
 
         resetForm();

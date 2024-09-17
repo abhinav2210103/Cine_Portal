@@ -37,7 +37,7 @@ const Spinner = ({ color } : { color : string }) => (
 
 
 export default function Page() {
-    if (typeof window == undefined)
+    if (typeof window === "undefined")
         return;
     const [loading, setLoading] = useState<boolean>(true);
     const [remainTime, setRemainTime] = useState<number>(0)
@@ -134,7 +134,7 @@ export default function Page() {
         }
     };
     const getQuestions = async (subject : string ) => {
-        if (typeof window == undefined)
+        if (typeof window === "undefined")
             return
         const userId = localStorage.getItem("userId");
         if (!userId) {
@@ -150,7 +150,7 @@ export default function Page() {
             language = await languageFetcher(userId);
         }        
         if (language == undefined) {
-            if (typeof window == undefined)
+            if (typeof window === "undefined")
                 return;
             localStorage.removeItem("userId");
             localStorage.removeItem("language");
@@ -158,7 +158,7 @@ export default function Page() {
             router.push("/login")
         }
         setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language])
-        if (typeof window == undefined)
+        if (typeof window === "undefined")
             return;
         localStorage.setItem("language", language);
         let responses = await responseFetcher(userId);
@@ -237,7 +237,7 @@ export default function Page() {
     }, []);
 
     useEffect(() => {
-        if (typeof window == undefined)
+        if (typeof window === "undefined")
             return;
         
         if (localStorage.getItem("userId") == null) {
@@ -354,7 +354,7 @@ export default function Page() {
                                 )
                         })}
                     </div>
-                    <button className='bg-[#546CFF] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => router.push('/confirmation')} disabled={loadingButton === "NA" || loadingButton === "A" || loadingButton === "MR" }>Submit</button>
+                    <button className={`bg-[#9ea9f0] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium`} onClick={() => router.push('/confirmation')} disabled={loadingButton != null  }>Submit</button>
                 </div>
             </div>
             <Image src="./icons/bg_logo.svg" alt="bgLogo" priority width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />

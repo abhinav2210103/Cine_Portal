@@ -114,7 +114,7 @@ export default function Confirmation() {
     }
     const handleSubmit = async  () => {
         try{
-            if (typeof window == undefined)
+            if (typeof window === 'undefined')
                 return;
             const userId = localStorage.getItem("userId");
             if (!userId)

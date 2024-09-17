@@ -8,7 +8,7 @@ interface SelectLanguageDropdownProps {
 
 export default function SelectLanguageDropdown({ selectedLanguage, setSelectedLanguage }: SelectLanguageDropdownProps) {
     const [open, setOpen] = useState<boolean>(false);
-    if (typeof window == undefined) {
+    if (typeof window === "undefined") {
         return;
     }
     const languages = [

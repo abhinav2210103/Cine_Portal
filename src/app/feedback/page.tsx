@@ -24,6 +24,10 @@ export default function Page() {
       setUserId(storedUserId);
     }
     if (!submitted) {
+      if(localStorage.getItem('submitted') === 'true') {
+        setSubmitted(true);
+        return ; 
+      }
       submitTest();
       setSubmitted(true);
     }
@@ -129,7 +133,7 @@ export default function Page() {
           </div>
         </div>
         <div className='w-[94%] mt-8 m-auto flex justify-center items-center'>
-          <Image src="/icons/bg_logo.svg" alt="bgLogo" width={10} height={10} className='absolute z-0 top-[50%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[22%]' />
+          <Image src="/icons/bg_logo.svg" alt="bgLogo" width={10} height={10} className='absolute z-0 top-[50%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[22%]' priority/>
           <div className='w-[98%] h-[84vh] flex flex-col items-center px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10'>
             <div className='font-bold mb-4 text-4xl mt-5'>FEEDBACK</div>
             <div className='w-[60rem] pb-5 bg-white rounded-3xl border p-2 border-black bg-opacity-50 flex flex-col gap-1rem justify-center items-center'>

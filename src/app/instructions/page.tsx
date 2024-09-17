@@ -1,22 +1,31 @@
 'use client'
-
 import React, { useState, useEffect  } from 'react';
 import Image from 'next/image';
 import dynamic from 'next/dynamic';
+import { useRouter} from 'next/navigation';
 
 const SelectLanguageContainer = dynamic(() => import('./components/SelectLanguageContainer'), { ssr: false });
 
 export default function Instruction() {
+    if(typeof window == undefined) return;   
+    const router = useRouter();
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
           event.preventDefault();
         };      
-        window.addEventListener('beforeunload', handleBeforeUnload);
+        window.addEventListener('beforeunload', handleBeforeUnload);        
         return () => {
           window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, []);
-    const [selectedLanguage, setSelectedLanguage] = useState<string>('');
+
+    useEffect(() => {
+        if (typeof window === 'undefined') return ; 
+        const userId = localStorage.getItem('userId');
+        if(!userId) router.push('/login');
+        const language = localStorage.getItem('language');
+        if(!language) router.push('/start');
+    }, [])
 
     const circleData = [
         { src: '/icons/redCircle.png', text: 'Not Answered' },
