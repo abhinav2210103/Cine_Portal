@@ -177,7 +177,7 @@ export default function Confirmation() {
                     </div>
                     <Image src="./icons/bg_logo.svg" alt="bgLogo" priority width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
                 </div>
-            ) : <Loader />}
+            ) : <Loader containerStyles='flex justify-center items-center h-screen w-full'/>}
         </div>
     );
 }

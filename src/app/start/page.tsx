@@ -142,14 +142,8 @@ export default function Page() {
             router.replace("/login");
             return;
         }
-        const localLanguage = localStorage.getItem("language"); 
-        let language : string ; 
-        if(localLanguage) {
-            language = localLanguage ; 
-        } else {
-            language = await languageFetcher(userId);
-        }        
-        if (language == undefined) {
+        let language = await languageFetcher(userId);
+        if (typeof language === "undefined") {
             if (typeof window === "undefined")
                 return;
             localStorage.removeItem("userId");
@@ -174,26 +168,6 @@ export default function Page() {
         dispatch(setQuestionsState(data));
         setLoading(false);
     };
-
-
-
-
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerHeight < window.outerHeight) {
-                toast.error("Full screen mode is compulsory, exiting full screen can result in disqualification")
-            }
-            else {
-                setFullScreen(true);
-            }
-        };
-        window.addEventListener('resize', handleResize);
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
-
-
     useEffect(() => {
         const handleBeforeUnload = (event: BeforeUnloadEvent) => {
           event.preventDefault();
@@ -203,7 +177,39 @@ export default function Page() {
           window.removeEventListener('beforeunload', handleBeforeUnload);
         };
     }, []);
-
+    useEffect(() => {
+        const handleResize = () => {
+            if (window.innerHeight < window.outerHeight) {
+                toast.error("Full screen mode is compulsory, exiting full screen can result in disqualification");
+                setFullScreen(false);
+            }
+            else {                
+                setFullScreen(true);
+            }
+        };
+        window.addEventListener('resize', handleResize);
+        return () => {
+            window.removeEventListener('resize', handleResize);
+        };
+    }, []);
+    useEffect(() => {
+        if (typeof window === "undefined")
+            return;
+        
+        if (localStorage.getItem("userId") == null) {
+            router.replace("/login");
+            return ; 
+        }
+        if(parseInt(localStorage.getItem("TREM") as string ) <= 0 ) {
+            router.push("/feedback");
+            return ; 
+        }
+        if (localStorage.getItem("TREM") != null) {
+            let data: number = parseInt(localStorage.getItem("TREM") || "0");
+            setRemainTime(data);
+        }
+        getQuestions(subject);
+    }, []);
     useEffect(() => {
         const disableTabChange = (event: KeyboardEvent) => {
             if (event.ctrlKey && (event.key === 'Tab' || event.key === 't' || event.key === 'T')) {
@@ -235,129 +241,115 @@ export default function Page() {
             window.removeEventListener('blur', handleBlur);
         };
     }, []);
-
-    useEffect(() => {
-        if (typeof window === "undefined")
-            return;
-        
-        if (localStorage.getItem("userId") == null) {
-            router.replace("/login");
-            return ; 
-        }
-        if(parseInt(localStorage.getItem("TREM") as string ) <= 0 ) {
-            router.push("/feedback");
-            return ; 
-        }
-        if (localStorage.getItem("TREM") != null) {
-            let data: number = parseInt(localStorage.getItem("TREM") || "0");
-            setRemainTime(data);
-        }
-        getQuestions(subject);
-    }, []);
-
     return (
-        <div><Toaster />{loading ? <Loader /> : fullScreen ? <div className='bg-[#EAEEFF] select-none h-screen relative'>
-
-            <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
-                <div className='flex justify-center items-center'>
-                    <Image src="./icons/csi_logo.svg" width={50} height={50} alt="csiLogo" className='px-3 w-[50px]' />
-                    <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
+        <div><Toaster />{loading ? (
+            <Loader containerStyles='flex justify-center items-center h-screen w-full'/>
+            ) : fullScreen ? (
+            <div className='bg-[#EAEEFF] select-none h-screen relative'>
+                <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
+                    <div className='flex justify-center items-center'>
+                        <Image src="./icons/csi_logo.svg" width={50} height={50} alt="csiLogo" className='px-3 w-[50px]' />
+                        <h1 className='text-xl font-medium pl-5'>CSI Exam Portal</h1>
+                    </div>
+                    <span className='text-lg'>
+                        Time Left : <Timer remainTime={remainTime} />
+                    </span>
                 </div>
-                <span className='text-lg'>
-                    Time Left : <Timer remainTime={remainTime} />
-                </span>
-            </div>
-            <div className='flex ml-[50%] -translate-x-[50%]'>
-                {navMenu?.map((element, id) => (
-                    <div key={id} className={`w-[120px] shadow-md hover:text-white font-medium mt-5 hover:bg-[#546CFF] cursor-pointer ${activeMenu == id ? "bg-[#546CFF] text-white" : "bg-white text-black"} flex justify-center items-center px-10 py-2  mx-[2px] transition-all duration-500 ${id == 0 ? "rounded-l-lg" : null} ${id == 4 ? "rounded-r-lg" : null}`} onClick={() => {
-                        setActiveMenu(id)
-                        dispatch(setActiveQuestionNumber(id*10+1));
-                    }}>{element}</div>
-                ))}
-            </div>
-            <div className='w-[94%] mt-8 m-auto flex justify-between items-center'>
-                <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 relative'>
-                    <div className='overflow-y-auto h-[calc(100%-80px)]'>                    
-                        <h1 className='text-2xl sm:text-3xl font-medium py-6 font-text-me-one text-gray-500'>
-                        Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}
-                        </h1>
-                        <hr className='border-t border-gray-300' />
-                        <h1 className='font-extrabold lg:text-lg xl:text-xl md:text-base sm:text-lg py-2 font-text-me-one text-gray-700'>
-                        <pre className='w-full sm:w-3/4 whitespace-pre-wrap break-words leading-6'>
-                            {allQuestions[activeQuestionNumber - 1]?.question}
-                        </pre>
-                        </h1>
-                        {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
-                        <div key={id} className='my-4 cursor-pointer'>
-                            <input
-                            type="radio"
-                            id={`opt${activeQuestionNumber}-${id}`}
-                            checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 
-                                ? answer !== "" 
-                                ? answer === i.desc 
-                                : allQuestions[activeQuestionNumber - 1].recordedAns === i.id 
-                                : answer === i.desc}
-                            onChange={() => { setAnswer(i.desc); }}
-                            name={`opt${activeQuestionNumber}`}
-                            />
-                            <label
-                            className='ml-2 text-[16px] sm:text-[17px] md:text-lg lg:text-xl  font-normal cursor-pointer font-text-me-one text-gray-700'
-                            htmlFor={`opt${activeQuestionNumber}-${id}`}
-                            >
-                            {i.desc}
-                            </label>
+                <div className='flex ml-[50%] -translate-x-[50%]'>
+                    {navMenu?.map((element, id) => (
+                        <div key={id} className={`w-[120px] shadow-md hover:text-white font-medium mt-5 hover:bg-[#546CFF] cursor-pointer ${activeMenu == id ? "bg-[#546CFF] text-white" : "bg-white text-black"} flex justify-center items-center px-10 py-2  mx-[2px] transition-all duration-500 ${id == 0 ? "rounded-l-lg" : null} ${id == 4 ? "rounded-r-lg" : null}`} onClick={() => {
+                            setActiveMenu(id)
+                            dispatch(setActiveQuestionNumber(id*10+1));
+                        }}>{element}</div>
+                    ))}
+                </div>
+                <div className='w-[94%] mt-8 m-auto flex justify-between items-center'>
+                    <div className='w-[72%] h-[72vh] px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 relative'>
+                        <div className='overflow-y-auto h-[calc(100%-80px)]'>                    
+                            <h1 className='text-2xl sm:text-3xl font-medium py-6 font-text-me-one text-gray-500'>
+                            Question-{allQuestions[activeQuestionNumber - 1].quesId % 100}
+                            </h1>
+                            <hr className='border-t border-gray-300' />
+                            <h1 className='font-extrabold lg:text-lg xl:text-xl md:text-base sm:text-lg py-2 font-text-me-one text-gray-700'>
+                            <pre className='w-full sm:w-3/4 whitespace-pre-wrap break-words leading-6'>
+                                {allQuestions[activeQuestionNumber - 1]?.question}
+                            </pre>
+                            </h1>
+                            {allQuestions[activeQuestionNumber - 1]?.options.map((i, id) => (
+                            <div key={id} className='my-4 cursor-pointer'>
+                                <input
+                                type="radio"
+                                id={`opt${activeQuestionNumber}-${id}`}
+                                checked={allQuestions[activeQuestionNumber - 1].recordedAns != 0 
+                                    ? answer !== "" 
+                                    ? answer === i.desc 
+                                    : allQuestions[activeQuestionNumber - 1].recordedAns === i.id 
+                                    : answer === i.desc}
+                                onChange={() => { setAnswer(i.desc); }}
+                                name={`opt${activeQuestionNumber}`}
+                                />
+                                <label
+                                className='ml-2 text-[16px] sm:text-[17px] md:text-lg lg:text-xl  font-normal cursor-pointer font-text-me-one text-gray-700'
+                                htmlFor={`opt${activeQuestionNumber}-${id}`}
+                                >
+                                {i.desc}
+                                </label>
+                            </div>
+                            ))}
                         </div>
-                        ))}
+                        <div className='absolute bottom-7'>
+                            <button 
+                                className={`bg-purple-600 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium ${loadingButton && loadingButton !== "MR" ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                                onClick={() => !loadingButton && buttonHandler("MR")}
+                                disabled={loadingButton !== null && loadingButton !== "MR"}>
+                                {loadingButton === "MR" ? <Spinner color="white" /> : "Mark for Review & Next"}
+                            </button>
+                            
+                            <button 
+                                className={`bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium ${loadingButton && loadingButton !== "A" ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                                onClick={() => !loadingButton && buttonHandler("A")}
+                                disabled={loadingButton !== null && loadingButton !== "A"}>
+                                {loadingButton === "A" ? <Spinner color="white" /> : "Save & Next"}
+                            </button>
+                            
+                            <button 
+                                className={`bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium ${loadingButton && loadingButton !== "NA" ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                                onClick={() => !loadingButton && buttonHandler("NA")}
+                                disabled={loadingButton !== null && loadingButton !== "NA"}>
+                                {loadingButton === "NA" ? <Spinner color="white"/> : "Skip"}
+                            </button>
+                            
+                            <button 
+                                className={`bg-white outline outline-1 outline-black mx-2 rounded-xl px-4 py-[10px] text-sm text-black font-medium ${loadingButton && loadingButton !== "clear" ? 'opacity-50 cursor-not-allowed' : ''}`} 
+                                onClick={() => !loadingButton && buttonHandler("clear")}
+                                disabled={loadingButton !== null && loadingButton !== "clear"}>
+                                {loadingButton === "clear" ? <Spinner  color="black"/> : "Clear Response"}
+                            </button>  
+                        </div>
                     </div>
-                    <div className='absolute bottom-7'>
-                        <button 
-                            className={`bg-purple-600 w-fit mx-2 rounded-xl px-4 py-[10px] text-white font-medium ${loadingButton && loadingButton !== "MR" ? 'opacity-50 cursor-not-allowed' : ''}`} 
-                            onClick={() => !loadingButton && buttonHandler("MR")}
-                            disabled={loadingButton !== null && loadingButton !== "MR"}>
-                            {loadingButton === "MR" ? <Spinner color="white" /> : "Mark for Review & Next"}
-                        </button>
-                        
-                        <button 
-                            className={`bg-[#00C289] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium ${loadingButton && loadingButton !== "A" ? 'opacity-50 cursor-not-allowed' : ''}`} 
-                            onClick={() => !loadingButton && buttonHandler("A")}
-                            disabled={loadingButton !== null && loadingButton !== "A"}>
-                            {loadingButton === "A" ? <Spinner color="white" /> : "Save & Next"}
-                        </button>
-                        
-                        <button 
-                            className={`bg-[#FF0000] w-[135px] mx-2 rounded-xl px-4 py-[10px] text-white font-medium ${loadingButton && loadingButton !== "NA" ? 'opacity-50 cursor-not-allowed' : ''}`} 
-                            onClick={() => !loadingButton && buttonHandler("NA")}
-                            disabled={loadingButton !== null && loadingButton !== "NA"}>
-                            {loadingButton === "NA" ? <Spinner color="white"/> : "Skip"}
-                        </button>
-                        
-                        <button 
-                            className={`bg-white outline outline-1 outline-black mx-2 rounded-xl px-4 py-[10px] text-sm text-black font-medium ${loadingButton && loadingButton !== "clear" ? 'opacity-50 cursor-not-allowed' : ''}`} 
-                            onClick={() => !loadingButton && buttonHandler("clear")}
-                            disabled={loadingButton !== null && loadingButton !== "clear"}>
-                            {loadingButton === "clear" ? <Spinner  color="black"/> : "Clear Response"}
-                        </button>  
-                    </div>
-                </div>
 
-                <div className='w-[25%] h-[72vh] bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 flex flex-col justify-center items-center'>
-                    <div className='w-[90%] outline outline-3 outline-[#546CFF] mb-3 text-2xl text-center rounded-lg font-bold text-[#546CFF] p-2'>
-                        Questions
+                    <div className='w-[25%] h-[72vh] bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10 flex flex-col justify-center items-center'>
+                        <div className='w-[90%] outline outline-3 outline-[#546CFF] mb-3 text-2xl text-center rounded-lg font-bold text-[#546CFF] p-2'>
+                            Questions
+                        </div>
+                        <div className='flex w-[90%] justify-around flex-wrap mt-2 h-[44vh] overflow-y-scroll'>
+                            {allQuestions.map((element, id) => {
+                                if (Math.floor(element.quesId / 100) - 1 == activeMenu)
+                                    return (
+                                        <div key={id} onClick={() => setAnswer("")}>
+                                            <QuesNoCard display={element.quesId} id={id} state={id == 0 ? "V" : "UV"} />
+                                        </div>
+                                    )
+                            })}
+                        </div>
+                        <button className={`bg-[${(loadingButton === "A" || loadingButton === "MR" || loadingButton === "clear" || loadingButton === "NA") ? "#9ea9f0" : "#3c4dbb"}] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium`} onClick={() => router.push('/confirmation')} disabled={loadingButton != null  }>Submit</button>
                     </div>
-                    <div className='flex w-[90%] justify-around flex-wrap mt-2 h-[44vh] overflow-y-scroll'>
-                        {allQuestions.map((element, id) => {
-                            if (Math.floor(element.quesId / 100) - 1 == activeMenu)
-                                return (
-                                    <div key={id} onClick={() => setAnswer("")}>
-                                        <QuesNoCard display={element.quesId} id={id} state={id == 0 ? "V" : "UV"} />
-                                    </div>
-                                )
-                        })}
-                    </div>
-                    <button className={`bg-[#9ea9f0] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium`} onClick={() => router.push('/confirmation')} disabled={loadingButton != null  }>Submit</button>
                 </div>
+                <Image src="./icons/bg_logo.svg" alt="bgLogo" priority width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
             </div>
-            <Image src="./icons/bg_logo.svg" alt="bgLogo" priority width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
-        </div> : <div className='flex justify-center items-center w-full h-screen text-xl font-bold'>Please do the Full Screen Mode to Start!</div>}</div>
+            ) : (
+                <div className='flex justify-center items-center w-full h-screen text-xl font-bold'>Please do the Full Screen Mode to Start!</div>
+            )}
+        </div>
     )
 }

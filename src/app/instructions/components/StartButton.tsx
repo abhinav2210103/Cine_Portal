@@ -42,6 +42,8 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
                     },
                     body: JSON.stringify({ userId: userId, preference: parseInt(selectedLanguage) })
                 });
+                if(typeof window !== "undefined")  return ; 
+                localStorage.setItem('language', selectedLanguage);
                 if (!response.ok) {
                     throw new Error('Network response was not ok');
                 }

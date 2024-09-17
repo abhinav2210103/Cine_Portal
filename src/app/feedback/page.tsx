@@ -125,7 +125,7 @@ export default function Page() {
 
   return (
     <>
-      {loading ? <Loader /> : <div className='bg-[#EAEEFF] h-screen relative'>
+      {loading ? <Loader containerStyles='flex justify-center items-center h-screen w-full' /> : <div className='bg-[#EAEEFF] h-screen relative'>
         <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
           <div className='flex justify-center items-center'>
             <Image src="/icons/csi_logo.svg" width={50} height={50} alt="csiLogo" className='px-3' />

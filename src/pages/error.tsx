@@ -18,7 +18,7 @@ export default function Error() {
         <Image src="/404error.svg" alt="404 error" width={500} height={500} />
         <Link href="/login">
           <div style={{ color: '#546CFF', textDecoration: 'underline', marginTop: '20px', fontSize:'20px' }}>
-          Click here to return to the Login Page.
+          Click here to return.
           </div>
         </Link>
       </div>

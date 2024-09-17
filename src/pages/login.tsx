@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import "../app/globals.css";
 import { FaEye, FaEyeSlash, FaUser, FaKey } from "react-icons/fa";
-// import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { useFormik } from "formik";
 import validationSchema from "@/app/constants/validationSchema";
@@ -85,12 +84,6 @@ const LoginComponent = () => {
     onSubmit: async (values) => {
       setDisabled(true);
       try {
-        // if (!executeRecaptcha) {
-        //   console.error("ReCAPTCHA not available");
-        //   return;
-        // }
-        // console.log("ok")
-        // const token = await executeRecaptcha("Login");
         const response = await fetch(
           `${baseurl}/student/login`,
           {
@@ -148,16 +141,8 @@ const LoginComponent = () => {
         } else {
             router.push("/start")
         }
-
-          // if (timeData.remainingTime == "10800000")
-          //   router.push("/instructions");
-          // else
-          //   router.push("/start");
-
-      } catch (error : any ) {
-        // console.log(error)
-        // toast.error("Login failed");
-      } finally {
+      } catch (error : any ) { } 
+      finally {
         setDisabled(false);
       }
     },

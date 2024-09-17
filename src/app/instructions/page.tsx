@@ -24,7 +24,7 @@ export default function Instruction() {
         const userId = localStorage.getItem('userId');
         if(!userId) router.push('/login');
         const language = localStorage.getItem('language');
-        if(!language) router.push('/start');
+        if(language) router.push('/start');
     }, [])
 
     const circleData = [

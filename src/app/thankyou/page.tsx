@@ -8,6 +8,7 @@ function page() {
             localStorage.removeItem("userId");
             localStorage.removeItem("TREM");
             localStorage.removeItem("language");
+            localStorage.removeItem("submitted"); 
         }
     }, []);
 
