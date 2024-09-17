@@ -14,14 +14,51 @@ export default function Page() {
   const [slider1, setSlider1] = useState<string>('1');
   const [slider2, setSlider2] = useState<string>('1');
   const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const [submitted , setSubmitted ] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedUserId = localStorage.getItem('userId') || '';
-      if (storedUserId == "")
-        router.push("/login")
+      if (storedUserId === "") {
+        router.push("/login");
+      }
       setUserId(storedUserId);
     }
+    if (!submitted) {
+      submitTest();
+      setSubmitted(true);
+    }
+  }, [submitted]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+    };      
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, []);
+
+  const submitTest = async () => {
+    try {
+      if (typeof window === 'undefined' || submitted) return;  
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        router.push('/login');
+        return;
+      }  
+      await fetch(baseurl + "/student/submitTest", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId }),
+      });
+      localStorage.setItem('submitted', 'true');  
+      setSubmitted(true); 
+    } catch (err) { }
+  };
+  
 
   const handleSlider1Change = (value: number) => {
     setSlider1(value.toString());
@@ -64,16 +101,6 @@ export default function Page() {
           body: JSON.stringify(feedbackData),
         });
         if (!response.ok) {
-          throw new Error('Network error');
-        }
-        const submitResponse = await fetch(baseurl + "/student/submitTest", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({ userId }),
-        });
-        if (!submitResponse.ok) {
           throw new Error('Network error');
         }
         router.replace("/thankyou")

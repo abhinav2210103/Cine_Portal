@@ -2,8 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import { useTimer } from 'react-timer-hook'
-
+import { useTimer } from 'react-timer-hook'    
 
 interface props {
     remainTime: number;
@@ -11,7 +10,6 @@ interface props {
 
 export default function Timer(props: props) {
     const router = useRouter();
-    const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL;
     const {
         totalSeconds,
         seconds,
@@ -28,14 +26,7 @@ export default function Timer(props: props) {
             return;
         const userId = localStorage.getItem("userId");
         if (!userId)
-            router.push("/login");
-        await fetch(baseurl + "/student/submitTest", {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ userId }),
-          });
+            router.push("/login");        
         localStorage.setItem("TREM", "0");
         router.push("/feedback") ; 
     }});

@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import "../app/globals.css";
 import { FaEye, FaEyeSlash, FaUser, FaKey } from "react-icons/fa";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
+// import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { useFormik } from "formik";
 import validationSchema from "@/app/constants/validationSchema";
@@ -10,7 +10,6 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { useRouter } from "next/router";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Loader from "@/components/Loader/Loader";
 
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
@@ -29,7 +28,7 @@ export default function Login(): React.ReactElement {
 
 const LoginComponent = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-  const { executeRecaptcha } = useGoogleReCaptcha();
+  // const { executeRecaptcha } = useGoogleReCaptcha();
   const [disabled, setDisabled] = useState<boolean>(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState<boolean>(false);
   const router = useRouter();
@@ -55,7 +54,6 @@ const LoginComponent = () => {
   useEffect(() => {
     if (typeof window === "undefined") return;
     const userId = localStorage.getItem("userId");
-    const trem = localStorage.getItem("TREM");
     const language = localStorage.getItem("language");
     if (userId && !language) {
       router.replace("/instructions");

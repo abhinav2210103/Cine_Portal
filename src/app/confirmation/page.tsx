@@ -42,19 +42,35 @@ export default function Confirmation() {
     const colors = ["#6B7280", "#ECB701", "#00C289", "#FF122E"];
 
     useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+          event.preventDefault();
+        };      
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
+
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const storedTime = localStorage.getItem('TREM');
             if (storedTime) {
                 setRemainTime(parseInt(storedTime, 10));
             }
         }
-
         async function getQuestion() {
             if (typeof window === 'undefined') return;
             
             const userId = localStorage.getItem('userId');
-            if (!userId) return;
-
+            if (!userId) {
+                router.push('/login');
+                return;
+            }
+            const trem : string  = localStorage.getItem('TREM') as string ;  
+            if(parseInt(trem) <= 0 ) {
+                router.push('/feedback');   
+                return; 
+            }
             let responses = await responseFetcher(userId);
             let data: QuestionType[] = [];
             let language;
@@ -71,8 +87,7 @@ export default function Confirmation() {
                 }
                 dispatch(setQuestionsState(data));
             }
-        }
-        
+        }        
         getQuestion();
     }, [dispatch]);
 
@@ -96,6 +111,19 @@ export default function Confirmation() {
 
         setSep(obj);
         setArr(temp);
+    }
+    const handleSubmit = async  () => {
+        try{
+            if (typeof window == undefined)
+                return;
+            const userId = localStorage.getItem("userId");
+            if (!userId)
+                router.push("/login");
+            localStorage.setItem("TREM", "0");
+            router.push("/feedback") ;
+        } catch (err) {
+
+        }
     }
 
     useEffect(() => {
@@ -142,7 +170,7 @@ export default function Confirmation() {
                                 <h1 className='text-2xl w-[80%] text-center font-bold'>Are you sure you want to submit your exam?</h1>
                                 <div className='flex justify-evenly w-full mt-6'>
                                     <button onClick={() => router.push("/start")} className='bg-[#B795E2] text-white font-bold py-2 px-10 rounded-xl'>Back to Test</button>
-                                    <button onClick={() => router.push("/feedback")} className='bg-[#546CFF] text-white font-bold py-2 px-10 rounded-xl'>Submit Test</button>
+                                    <button onClick={handleSubmit} className='bg-[#546CFF] text-white font-bold py-2 px-10 rounded-xl'>Submit Test</button>
                                 </div>
                             </div>
                         </div>

@@ -50,14 +50,16 @@ export default function Page() {
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const [answer, setAnswer] = useState<string>("");
     const [loadingButton, setLoadingButton] = useState<string | null>(null);
+    const [subject , setSubject ] = useState<string>("HTML");
 
     const changeState = (type: string, ansId: number) => {
         let temp: QuestionType[] = [];
         allQuestions.forEach((element, id) => {
             id + 1 === activeQuestionNumber ? temp.push({ ...element, state: type, recordedAns: ansId }) : temp.push(element);
         });
-        if (activeQuestionNumber === allQuestions.length) {
+        if (activeQuestionNumber === allQuestions.length ) {
             dispatch(setActiveQuestionNumber(1));
+            setActiveMenu(0); 
         } else {
             setActiveMenu(Math.floor(allQuestions[activeQuestionNumber].quesId / 100) - 1);
             dispatch(setActiveQuestionNumber(activeQuestionNumber + 1));
@@ -131,7 +133,7 @@ export default function Page() {
             setLoadingButton(null);  
         }
     };
-    const getQuestions = async () => {
+    const getQuestions = async (subject : string ) => {
         if (typeof window == undefined)
             return
         const userId = localStorage.getItem("userId");
@@ -140,7 +142,13 @@ export default function Page() {
             router.replace("/login");
             return;
         }
-        let language = await languageFetcher(userId);
+        const localLanguage = localStorage.getItem("language"); 
+        let language : string ; 
+        if(localLanguage) {
+            language = localLanguage ; 
+        } else {
+            language = await languageFetcher(userId);
+        }        
         if (language == undefined) {
             if (typeof window == undefined)
                 return;
@@ -168,6 +176,8 @@ export default function Page() {
     };
 
 
+
+
     useEffect(() => {
         const handleResize = () => {
             if (window.innerHeight < window.outerHeight) {
@@ -185,12 +195,14 @@ export default function Page() {
 
 
     useEffect(() => {
-        function BeforeUnloadHandler(event: BeforeUnloadEvent) {
-            event.preventDefault();
-            return (event.returnValue = "")
-        }
-        window.addEventListener('beforeunload', BeforeUnloadHandler, { capture: true })
-    }, [])
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+          event.preventDefault();
+        };      
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
 
     useEffect(() => {
         const disableTabChange = (event: KeyboardEvent) => {
@@ -230,12 +242,17 @@ export default function Page() {
         
         if (localStorage.getItem("userId") == null) {
             router.replace("/login");
+            return ; 
+        }
+        if(parseInt(localStorage.getItem("TREM") as string ) <= 0 ) {
+            router.push("/feedback");
+            return ; 
         }
         if (localStorage.getItem("TREM") != null) {
             let data: number = parseInt(localStorage.getItem("TREM") || "0");
             setRemainTime(data);
         }
-        getQuestions();
+        getQuestions(subject);
     }, []);
 
     return (
@@ -337,7 +354,7 @@ export default function Page() {
                                 )
                         })}
                     </div>
-                    <button className='bg-[#546CFF] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => router.push('/confirmation')}>Submit</button>
+                    <button className='bg-[#546CFF] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium' onClick={() => router.push('/confirmation')} disabled={loadingButton === "NA" || loadingButton === "A" || loadingButton === "MR" }>Submit</button>
                 </div>
             </div>
             <Image src="./icons/bg_logo.svg" alt="bgLogo" priority width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
