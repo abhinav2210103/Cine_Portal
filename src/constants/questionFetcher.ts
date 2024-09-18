@@ -1,57 +1,16 @@
 "use server";
-interface responseType {
-    quesId: string;
-    status: number;
-    userId: string;
-    ansId: number;
+
+type PromiseData = {
+    language : string ; 
+    questions : any[] ;
+    responses : any[]; 
 }
 
-const responseIds = ["NA", "MR", "A"];
-
-async function questionFetcher(
-    subjects: string[],
-    subject: string,
-    userId: string,
-    responses: responseType[]
-) {
+async function questionFetcher( userId: string) : Promise<PromiseData | string >{
     try {
-        const res = await fetch(
-            process.env.BACKEND_URL +
-                "/student/questions?" +
-                `subject=${subject}&userId=${userId}`
-        );
-        const idx = subjects.indexOf(subject);
+        const res = await fetch(`${process.env.BACKEND_URL}/student/questions?userId=${userId}`);
         const data = await res.json();
-        for (let index = 0; index < data.length; index++) {
-            if (responses.length > 0) {
-                for (let i = 0; i < responses.length; i++) {
-                    if (responses[i]?.quesId == data[index]._id) {
-                        data[index] = {
-                            ...data[index],
-                            quesId: 100 * (idx + 1) + index + 1,
-                            state: responseIds[responses[i].status],
-                            recordedAns: responses[i].ansId,
-                        };
-                        break;
-                    } else {
-                        data[index] = {
-                            ...data[index],
-                            quesId: 100 * (idx + 1) + index + 1,
-                            state: "UA",
-                            recordedAns: 0,
-                        };
-                    }
-                }
-            } else {
-                data[index] = {
-                    ...data[index],
-                    quesId: 100 * (idx + 1) + index + 1,
-                    state: "UA",
-                    recordedAns: 0,
-                };
-            }
-        }
-        return data;
+        return data ; 
     } catch (error) {
         return "Error fetching the questions";
     }

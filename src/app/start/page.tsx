@@ -7,13 +7,10 @@ import { setQuestionsState } from '@/store/questionStateSlice';
 import { setActiveQuestionNumber } from '@/store/questionSlice';
 import toast, { Toaster } from 'react-hot-toast';
 import Loader from '@/components/Loader/Loader';
-import { questionFetcher } from '@/constants/questionFetcher';
 import Image from 'next/image';
-import { responseFetcher } from '@/constants/responseFetcher';
 import { responseSetter } from '@/constants/responseSetter';
 import { useRouter } from 'next/navigation';
 import Timer from '@/components/Timer';
-import { languageFetcher } from '@/constants/languageFetcher';
 import submitTest from '@/constants/submitTest';
 interface Option {
     desc: string,
@@ -70,8 +67,7 @@ export default function Page() {
 
     const buttonHandler = async (state: string) => {
         setLoadingButton(state);  
-        let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;       
-               
+        let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;                      
         try {          
             if(state === "A"  && allQuestions[activeQuestionNumber -1 ]?.state === "A" && answer === "" ) {
                 changeState("A", ansId) ; 
@@ -135,35 +131,47 @@ export default function Page() {
         }
     };
     const getQuestions = async () => {
-        if (typeof window === "undefined")
-            return
+        if (typeof window === "undefined") return;
+    
         if (!userId) {
             toast.error("User not found");
             router.replace("/login");
             return;
         }
-        let language = await languageFetcher(userId);
-        if (typeof language === "undefined") {
-            if (typeof window === "undefined")
-                return;
+        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/student/questions?userId=${userId}`);
+        const responseData = await res.json();
+        const { language, questions, responses } = responseData;
+        if (!language) {
             localStorage.removeItem("userId");
             localStorage.removeItem("language");
             localStorage.removeItem("TREM");
-            router.push("/login")
-        }
-        setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language])
-        if (typeof window === "undefined")
+            router.push("/login");
             return;
+        }
+        setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language]);
         localStorage.setItem("language", language);
-        let responses = await responseFetcher(userId);
-        if (responses?.message) {
-            router.replace("/login");
-            return;
-        }
+
         let data: QuestionType[] = [];
-        for (let i = 0; i < navMenu.length; i++) {
-            let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language], ['HTML', 'SQL', 'CSS', 'Aptitude', language][i], userId, responses);
-            data = [...data, ...temp];
+        const questionsBySubject = questions.reduce((acc: any, question: any) => {
+            if (!acc[question.subject]) {
+                acc[question.subject] = [];
+            }
+            acc[question.subject].push(question);
+            return acc;
+        }, {});
+        const subjectsOrder = ['HTML', 'SQL', 'CSS', 'Aptitude', language];
+        const responseIds = ["NA", "MR", "A"];
+        const isResponsesEmpty = !Array.isArray(responses) || responses.length === 0;
+        for (const subject of subjectsOrder) {
+            const subjectQuestions = questionsBySubject[subject] || [];
+            const randomizedQuestions = subjectQuestions.map((q: any, index: number) => ({
+                ...q,
+                quesId: 100 * (subjectsOrder.indexOf(subject) + 1) + index + 1,
+                state: isResponsesEmpty ? "UA" : responseIds[responses.find((r: any) => r.quesId === q._id)?.status] || "UA",
+                recordedAns: isResponsesEmpty ? 0 : responses.find((r: any) => r.quesId === q._id)?.ansId || 0,
+            }));
+    
+            data.push(...randomizedQuestions);
         }
         dispatch(setQuestionsState(data));
         setLoading(false);

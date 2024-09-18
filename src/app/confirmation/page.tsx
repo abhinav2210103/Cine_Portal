@@ -3,8 +3,6 @@
 import BarChartQuestions from '@/components/BarChartQuestions';
 import Loader from '@/components/Loader/Loader';
 import Timer from '@/components/Timer';
-import { questionFetcher } from '@/constants/questionFetcher';
-import { responseFetcher } from '@/constants/responseFetcher';
 import { setQuestionsState } from '@/store/questionStateSlice';
 import { RootState } from '@/store/store';
 import Image from 'next/image';
@@ -12,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-
+import { questionFetcher } from '@/constants/questionFetcher';
 interface Option {
     desc: string,
     id: number,
@@ -30,6 +28,8 @@ interface QuestionType {
 }
 
 export default function Confirmation() {
+    if(typeof window === 'undefined') return; 
+    const userId = localStorage.getItem('userId');
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const dispatch = useDispatch();
     const [loading, setLoading] = useState<boolean>(true);
@@ -60,8 +60,6 @@ export default function Confirmation() {
         }
         async function getQuestion() {
             if (typeof window === 'undefined') return;
-            
-            const userId = localStorage.getItem('userId');
             if (!userId) {
                 router.push('/login');
                 return;
@@ -71,22 +69,45 @@ export default function Confirmation() {
                 router.push('/feedback');   
                 return; 
             }
-            let responses = await responseFetcher(userId);
+            const responseData = await questionFetcher(userId); 
+            if(typeof responseData === 'string') {
+                router.push('/login');
+                return;
+            }
+            const { language, questions, responses } = responseData;
+            if (!language) {
+                localStorage.removeItem("userId");
+                localStorage.removeItem("language");
+                localStorage.removeItem("TREM");
+                router.push("/login");
+                return;
+            }
+            setMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language]);
+            localStorage.setItem("language", language);
+
             let data: QuestionType[] = [];
-            let language;
-
-            if (typeof window !== 'undefined') {
-                language = localStorage.getItem('language');
-                setMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language || ""]);
-            }
-
-            if (language) {
-                for (let i = 0; i < ['HTML', 'SQL', 'CSS', 'Aptitude', language].length; i++) {
-                    let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language || ""], ['HTML', 'SQL', 'CSS', 'Aptitude', language || ""][i], userId, responses);
-                    data = [...data, ...temp];
+            const questionsBySubject = questions.reduce((acc: any, question: any) => {
+                if (!acc[question.subject]) {
+                    acc[question.subject] = [];
                 }
-                dispatch(setQuestionsState(data));
+                acc[question.subject].push(question);
+                return acc;
+            }, {});
+            const subjectsOrder = ['HTML', 'SQL', 'CSS', 'Aptitude', language];
+            const responseIds = ["NA", "MR", "A"];
+            const isResponsesEmpty = !Array.isArray(responses) || responses.length === 0;
+            for (const subject of subjectsOrder) {
+                const subjectQuestions = questionsBySubject[subject] || [];
+                const randomizedQuestions = subjectQuestions.map((q: any, index: number) => ({
+                    ...q,
+                    quesId: 100 * (subjectsOrder.indexOf(subject) + 1) + index + 1,
+                    state: isResponsesEmpty ? "UA" : responseIds[responses.find((r: any) => r.quesId === q._id)?.status] || "UA",
+                    recordedAns: isResponsesEmpty ? 0 : responses.find((r: any) => r.quesId === q._id)?.ansId || 0,
+                }));
+        
+                data.push(...randomizedQuestions);
             }
+            dispatch(setQuestionsState(data));
         }        
         getQuestion();
     }, [dispatch]);
