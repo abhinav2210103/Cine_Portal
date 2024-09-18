@@ -9,7 +9,6 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { useRouter } from "next/router";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import loginService from "@/constants/loginService";
 
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
@@ -84,27 +83,38 @@ const LoginComponent = () => {
     onSubmit: async (values) => {
       setDisabled(true);
       try {
-        const data = await loginService(values);
-        if (typeof data === "string") {
-            toast.error(data);
-            setDisabled(false);
-            return;
-        }
-        if (data.message === "Test already submitted") {
-            toast.error("Test already submitted. Please contact the invigilator.");
-            setDisabled(false);
-            return;
+        const response = await fetch(
+          `${baseurl}/student/login`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ ...values }),
+            credentials: "include",
+          }
+        )
+        const data = await response.json();
+        if (!response.ok) {
+            if (response.status === 400) {
+                toast.error(data.message === "Test already submitted"
+                    ? "Test already submitted. Please contact the invigilator."
+                    : "Invalid credentials. Please try again.");
+            } else {
+                toast.error("An unexpected error occurred. Please try again later.");
+            }
+            throw new Error(`HTTP error! Status: ${response.status}`);
         }
         if (typeof window !== "undefined") {
             localStorage.setItem('userId', data.userId);
-            localStorage.setItem('TREM', data.remainingTime.toString()); 
+            localStorage.setItem('TREM', data.remainingTime);
         }
         resetForm();
         if (data.language === "Invalid preference number") {
             router.push("/instructions");
         } else {
             router.push("/start");
-        }
+        } 
       } catch (error : any ) { } 
       finally {
         setDisabled(false);
