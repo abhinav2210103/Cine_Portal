@@ -253,7 +253,7 @@ export default function Page() {
     }, []);
     useEffect(()=> {
         if(typeof window === "undefined") return ;  
-        if(tabSwitchCount >= 3 ) {
+        if(tabSwitchCount >= 1 ) {
             tabSwitchHandler(); 
             return; 
         } else if ( tabSwitchCount >= 1) {
