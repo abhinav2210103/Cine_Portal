@@ -8,10 +8,8 @@ async function responseFetcher(userId: string) {
                 `userId=${userId}`
         );
         const data = await res.json();
-
         return data;
     } catch (error) {
-        // console.log(error);
         return "Error fetching the response";
     }
 }

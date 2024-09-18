@@ -14,7 +14,7 @@ import { responseSetter } from '@/constants/responseSetter';
 import { useRouter } from 'next/navigation';
 import Timer from '@/components/Timer';
 import { languageFetcher } from '@/constants/languageFetcher';
-
+import submitTest from '@/constants/submitTest';
 interface Option {
     desc: string,
     id: number,
@@ -36,9 +36,10 @@ const Spinner = ({ color } : { color : string }) => (
 );
 
 
-export default function Page() {
+export default function Page() {    
     if (typeof window === "undefined")
-        return;
+        return;    
+    const userId = localStorage.getItem("userId"); 
     const [loading, setLoading] = useState<boolean>(true);
     const [remainTime, setRemainTime] = useState<number>(0)
     const [fullScreen, setFullScreen] = useState<boolean>(window.innerHeight > window.outerHeight);
@@ -50,7 +51,7 @@ export default function Page() {
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const [answer, setAnswer] = useState<string>("");
     const [loadingButton, setLoadingButton] = useState<string | null>(null);
-    const [subject , setSubject ] = useState<string>("HTML");
+    const [tabSwitchCount , setTabSwitchCount ] = useState<number>(0);
 
     const changeState = (type: string, ansId: number) => {
         let temp: QuestionType[] = [];
@@ -70,7 +71,7 @@ export default function Page() {
     const buttonHandler = async (state: string) => {
         setLoadingButton(state);  
         let ansId: number = allQuestions[activeQuestionNumber - 1].recordedAns;       
-        const userId = localStorage.getItem("userId");        
+               
         try {          
             if(state === "A"  && allQuestions[activeQuestionNumber -1 ]?.state === "A" && answer === "" ) {
                 changeState("A", ansId) ; 
@@ -133,10 +134,9 @@ export default function Page() {
             setLoadingButton(null);  
         }
     };
-    const getQuestions = async (subject : string ) => {
+    const getQuestions = async () => {
         if (typeof window === "undefined")
             return
-        const userId = localStorage.getItem("userId");
         if (!userId) {
             toast.error("User not found");
             router.replace("/login");
@@ -168,35 +168,25 @@ export default function Page() {
         dispatch(setQuestionsState(data));
         setLoading(false);
     };
-    useEffect(() => {
-        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
-          event.preventDefault();
-        };      
-        window.addEventListener('beforeunload', handleBeforeUnload);
-        return () => {
-          window.removeEventListener('beforeunload', handleBeforeUnload);
-        };
-    }, []);
-    useEffect(() => {
-        const handleResize = () => {
-            if (window.innerHeight < window.outerHeight) {
-                toast.error("Full screen mode is compulsory, exiting full screen can result in disqualification");
-                setFullScreen(false);
-            }
-            else {                
-                setFullScreen(true);
-            }
-        };
-        window.addEventListener('resize', handleResize);
-        return () => {
-            window.removeEventListener('resize', handleResize);
-        };
-    }, []);
+    const tabSwitchHandler = async  () => {    
+        try {
+            toast.error("Tab switch detected. You will be logged out in 3 seconds. Contact the invigilator and leave the exam venue.");
+            await submitTest(userId as string);            
+            setTimeout(() => {
+                localStorage.removeItem("userId");
+                localStorage.removeItem("language");
+                localStorage.removeItem("TREM");
+                router.push("/login");
+            }, 3000); 
+            return;
+        } catch (err) {
+            toast.error("An unexpected error occurred. Please try again later.");
+        }
+    };
     useEffect(() => {
         if (typeof window === "undefined")
             return;
-        
-        if (localStorage.getItem("userId") == null) {
+        if (userId === null) {
             router.replace("/login");
             return ; 
         }
@@ -208,39 +198,60 @@ export default function Page() {
             let data: number = parseInt(localStorage.getItem("TREM") || "0");
             setRemainTime(data);
         }
-        getQuestions(subject);
+        getQuestions();
     }, []);
-    useEffect(() => {
+    useEffect(() => {        
         const disableTabChange = (event: KeyboardEvent) => {
             if (event.ctrlKey && (event.key === 'Tab' || event.key === 't' || event.key === 'T')) {
                 event.preventDefault();
             }
         };
-        const handleBlur = () => {
-            toast.error("Tab switching detected. Please stay on the exam page.");
+        const handleResize = () => {
+            if (window.innerHeight < window.outerHeight) {
+                toast.error("Full screen mode is compulsory, exiting full screen can result in disqualification");
+                setFullScreen(false);
+            }
+            else {                
+                setFullScreen(true);
+            }
         };
-
+        const handleBlur = () => {
+            setTabSwitchCount(prev => {
+                const newCount = prev + 1;                
+                return newCount;
+            });         
+        };
         const disableKeydown = (event: KeyboardEvent) => {
             if (event.ctrlKey || event.altKey || event.metaKey) {
                 event.preventDefault();
             }
         };
-
         const disableContextMenu = (event: MouseEvent) => {
             event.preventDefault();
         };
+        window.onbeforeunload = null;
         window.addEventListener('blur', handleBlur);
         window.addEventListener('keydown', disableTabChange);
+        window.addEventListener('resize', handleResize);
         window.addEventListener('keydown', disableKeydown);
         window.addEventListener('contextmenu', disableContextMenu);
-
         return () => {
             window.removeEventListener('keydown', disableTabChange);
             window.removeEventListener('keydown', disableKeydown);
             window.removeEventListener('contextmenu', disableContextMenu);
             window.removeEventListener('blur', handleBlur);
+            window.removeEventListener('resize', handleResize);
         };
     }, []);
+    useEffect(()=> {
+        if(typeof window === "undefined") return ;  
+        if(tabSwitchCount >= 3 ) {
+            tabSwitchHandler(); 
+            return; 
+        } else if ( tabSwitchCount >= 1) {
+            toast.error("Tab switching detected.");
+        }        
+    }, [tabSwitchCount])
     return (
         <div><Toaster />{loading ? (
             <Loader containerStyles='flex justify-center items-center h-screen w-full'/>
@@ -342,7 +353,7 @@ export default function Page() {
                                     )
                             })}
                         </div>
-                        <button className={`bg-[${(loadingButton === "A" || loadingButton === "MR" || loadingButton === "clear" || loadingButton === "NA") ? "#9ea9f0" : "#3c4dbb"}] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium`} onClick={() => router.push('/confirmation')} disabled={loadingButton != null  }>Submit</button>
+                        <button className={`bg-[${loadingButton === null ? "#3c4dbb" : "#333"  }] w-[80%] mt-6 mx-2 rounded-xl px-4 py-[10px] text-white font-medium`} onClick={()=>router.push('/confirmation')} disabled={loadingButton !== null  }>Submit</button>
                     </div>
                 </div>
                 <Image src="./icons/bg_logo.svg" alt="bgLogo" priority width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />

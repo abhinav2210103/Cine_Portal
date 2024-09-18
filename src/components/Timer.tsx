@@ -28,6 +28,7 @@ export default function Timer(props: props) {
         if (!userId)
             router.push("/login");        
         localStorage.setItem("TREM", "0");
+        
         router.push("/feedback") ; 
     }});
     useEffect(() => {

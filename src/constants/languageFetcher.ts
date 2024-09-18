@@ -11,7 +11,7 @@ async function languageFetcher(userId: string) {
         const data = await res.json();
         return data.language;
     } catch (error) {
-        // console.log("Error fetching language : " + error);
+        return "Error fetching the language";
     }
 }
 

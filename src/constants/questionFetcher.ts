@@ -1,5 +1,4 @@
 "use server";
-
 interface responseType {
     quesId: string;
     status: number;
@@ -54,7 +53,6 @@ async function questionFetcher(
         }
         return data;
     } catch (error) {
-        // console.log(error);
         return "Error fetching the questions";
     }
 }

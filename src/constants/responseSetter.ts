@@ -22,7 +22,6 @@ async function responseSetter(
         }),
         credentials: "include",
     });
-    const data = await res.json();
 }
 
 export { responseSetter };

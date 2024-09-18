@@ -27,7 +27,6 @@ export default function Login(): React.ReactElement {
 
 const LoginComponent = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-  // const { executeRecaptcha } = useGoogleReCaptcha();
   const [disabled, setDisabled] = useState<boolean>(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState<boolean>(false);
   const router = useRouter();
