@@ -4,6 +4,8 @@ import Image from 'next/image';
 import FeedbackSlider from '@/components/FeedbackSlider';
 import Loader from '@/components/Loader/Loader';
 import { useRouter } from 'next/navigation';
+import submitTestService from '@/constants/submitTest';
+import submitFeedbackService from '@/constants/submitFeedbackService';
 
 export default function Page() {
   const [userId, setUserId] = useState<string>('');
@@ -13,7 +15,6 @@ export default function Page() {
   const [error, setError] = useState<string>('');
   const [slider1, setSlider1] = useState<string>('1');
   const [slider2, setSlider2] = useState<string>('1');
-  const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL;
   const [submitted , setSubmitted ] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -51,13 +52,7 @@ export default function Page() {
         router.push('/login');
         return;
       }  
-      await fetch(baseurl + "/student/submitTest", {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ userId }),
-      });
+      await submitTestService(userId);
       localStorage.setItem('submitted', 'true');  
       setSubmitted(true); 
     } catch (err) { }
@@ -97,22 +92,11 @@ export default function Page() {
 
       try {
         setLoading(true);
-        const response = await fetch(baseurl + "/student/submitFeedback", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(feedbackData),
-        });
-        if (!response.ok) {
-          throw new Error('Network error');
-        }
+        await submitFeedbackService(feedbackData);  
         router.replace("/thankyou")
         setLoading(false);
       } catch (error) {
-        setLoading(false);
-        // console.error('Error submitting feedback:', error);
-      }
+      } finally { setLoading(false); }
     }
   };
 

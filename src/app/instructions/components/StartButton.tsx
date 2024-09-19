@@ -2,6 +2,8 @@
 import React, { ChangeEvent, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ClipLoader from 'react-spinners/ClipLoader';
+import setPreferenceService from '@/constants/setPreference';
+import { toast } from 'react-toastify';
 
 interface StartButtonProps {
     selectedLanguage: string;
@@ -32,15 +34,13 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
         if (selectedLanguage) {
             setLoading(true);
             try {
-                const response = await fetch('https://cine-student.onrender.com/student/preferences', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userId: userId, preference: parseInt(selectedLanguage) })
-                });
+                const response = await setPreferenceService(userId, selectedLanguage);
+                if (response === "Error fetching the response") {
+                    throw new Error("Error fetching the response");
+                }
                 router.push('/start');                 
             } catch (error) {
+                toast.error("Error starting the test");
             } finally {
                 setLoading(false);
             }

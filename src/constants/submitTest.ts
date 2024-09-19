@@ -1,6 +1,6 @@
 "use server"; 
 
-export default async function submitTest(userId : string ) {
+export default async function submitTestService(userId : string ) {
   try{
     const res = await fetch(process.env.BACKEND_URL + "/student/submitTest", {
       method: "POST",

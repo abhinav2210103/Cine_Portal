@@ -11,7 +11,8 @@ import Image from 'next/image';
 import { responseSetter } from '@/constants/responseSetter';
 import { useRouter } from 'next/navigation';
 import Timer from '@/components/Timer';
-import submitTest from '@/constants/submitTest';
+import submitTestService from '@/constants/submitTest';
+import { questionFetcher } from '@/constants/questionFetcher';
 interface Option {
     desc: string,
     id: number,
@@ -138,8 +139,11 @@ export default function Page() {
             router.replace("/login");
             return;
         }
-        const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/student/questions?userId=${userId}`);
-        const responseData = await res.json();
+        const responseData = await questionFetcher(userId); 
+        if(typeof responseData === 'string') {
+            router.push('/login');
+            return;
+        }
         const { language, questions, responses } = responseData;
         if (!language) {
             localStorage.removeItem("userId");
@@ -179,7 +183,7 @@ export default function Page() {
     const tabSwitchHandler = async  () => {    
         try {
             toast.error("Tab switch detected. You will be logged out in 3 seconds. Contact the invigilator and leave the exam venue.");
-            await submitTest(userId as string);            
+            await submitTestService(userId as string);            
             setTimeout(() => {
                 localStorage.removeItem("userId");
                 localStorage.removeItem("language");
