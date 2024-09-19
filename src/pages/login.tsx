@@ -83,39 +83,36 @@ const LoginComponent = () => {
     onSubmit: async (values) => {
       setDisabled(true);
       try {
-        const response = await fetch(
-          `${baseurl}/student/login`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ ...values }),
-            credentials: "include",
-          }
-        )
-        const data = await response.json();
-        console.log(data); 
-        if (!response.ok) {
-            if (response.status === 400) {
-                toast.error(data.message === "Test already submitted"
-                    ? "Test already submitted. Please contact the invigilator."
-                    : "Invalid credentials. Please try again.");
-            } else {
-                toast.error("An unexpected error occurred. Please try again later.");
-            }
-            throw new Error(`HTTP error! Status: ${response.status}`);
+        const loginResponse = await fetch("/api/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...values }),
+        });
+        if(loginResponse.status === 500) {
+          toast.error("Error logging in. Please try again.");
+          return;
+        }        
+        const loginData = await loginResponse.json();
+        if(loginData.message === "Invalid credentials") {
+          toast.error("Invalid credentials. Please try again.");
+          return;
+        }
+        if(loginData.message === "Test already submitted") {
+          toast.error("Test already submitted. Please contact the invigilator.");
+          return;
         }
         if (typeof window !== "undefined") {
-            localStorage.setItem('userId', data.userId);
-            localStorage.setItem('TREM', data.remainingTime);
+          localStorage.setItem('userId', loginData.userId);
+          localStorage.setItem('TREM', loginData.remainingTime);
         }
         resetForm();
-        if (data.language === "Invalid preference number") {
+        if (loginData.language === "Invalid preference number") {
             router.push("/instructions");
         } else {
             router.push("/start");
-        } 
+        }
       } catch (error : any ) { } 
       finally {
         setDisabled(false);
