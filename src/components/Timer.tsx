@@ -2,14 +2,14 @@
 
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
-import { useTimer } from 'react-timer-hook'
+import { useTimer } from 'react-timer-hook'    
 
 interface props {
     remainTime: number;
 }
 
 export default function Timer(props: props) {
-    const router = useRouter()
+    const router = useRouter();
     const {
         totalSeconds,
         seconds,
@@ -21,9 +21,18 @@ export default function Timer(props: props) {
         pause,
         resume,
         restart,
-    } = useTimer({ expiryTimestamp: new Date(Date.now() + parseInt(localStorage.getItem("TREM") || "")), onExpire: () => router.push("/feedback") });
+    } = useTimer({ expiryTimestamp: new Date(Date.now() + parseInt(localStorage.getItem("TREM") || "")), onExpire: async  () => {
+        if (typeof window === "undefined")
+            return;
+        const userId = localStorage.getItem("userId");
+        if (!userId)
+            router.push("/login");        
+        localStorage.setItem("TREM", "0");
+        
+        router.push("/feedback") ; 
+    }});
     useEffect(() => {
-        if (typeof window == undefined)
+        if (typeof window === "undefined")
             return;
         const prevTime = parseInt(localStorage.getItem("TREM") || "");
         localStorage.setItem("TREM", `${prevTime - 1000}`);

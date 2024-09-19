@@ -4,6 +4,8 @@ import Image from 'next/image';
 import FeedbackSlider from '@/components/FeedbackSlider';
 import Loader from '@/components/Loader/Loader';
 import { useRouter } from 'next/navigation';
+import submitTestService from '@/constants/submitTest';
+import submitFeedbackService from '@/constants/submitFeedbackService';
 
 export default function Page() {
   const [userId, setUserId] = useState<string>('');
@@ -13,15 +15,49 @@ export default function Page() {
   const [error, setError] = useState<string>('');
   const [slider1, setSlider1] = useState<string>('1');
   const [slider2, setSlider2] = useState<string>('1');
-  const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL;
+  const [submitted , setSubmitted ] = useState<boolean>(false);
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedUserId = localStorage.getItem('userId') || '';
-      if (storedUserId == "")
-        router.push("/login")
+      if (storedUserId === "") {
+        router.push("/login");
+      }
       setUserId(storedUserId);
     }
+    if (!submitted) {
+      if(localStorage.getItem('submitted') === 'true') {
+        setSubmitted(true);
+        return ; 
+      }
+      submitTest();
+      setSubmitted(true);
+    }
+  }, [submitted]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      event.preventDefault();
+    };      
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => {
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
   }, []);
+
+  const submitTest = async () => {
+    try {
+      if (typeof window === 'undefined' || submitted) return;  
+      const userId = localStorage.getItem('userId');
+      if (!userId) {
+        router.push('/login');
+        return;
+      }  
+      await submitTestService(userId);
+      localStorage.setItem('submitted', 'true');  
+      setSubmitted(true); 
+    } catch (err) { }
+  };
+  
 
   const handleSlider1Change = (value: number) => {
     setSlider1(value.toString());
@@ -56,24 +92,11 @@ export default function Page() {
 
       try {
         setLoading(true);
-        const response = await fetch(baseurl + "/student/submitFeedback", {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify(feedbackData),
-        });
-        if (!response.ok) {
-          throw new Error('Network error');
-        }
-
-        const data = await response.json();
+        await submitFeedbackService(feedbackData);  
         router.replace("/thankyou")
         setLoading(false);
       } catch (error) {
-        setLoading(false);
-        console.error('Error submitting feedback:', error);
-      }
+      } finally { setLoading(false); }
     }
   };
 
@@ -86,7 +109,7 @@ export default function Page() {
 
   return (
     <>
-      {loading ? <Loader /> : <div className='bg-[#EAEEFF] h-screen relative'>
+      {loading ? <Loader containerStyles='flex justify-center items-center h-screen w-full' /> : <div className='bg-[#EAEEFF] h-screen relative'>
         <div className='bg-[#546CFF] w-full flex justify-between items-center px-6 py-4 text-white font-semibold'>
           <div className='flex justify-center items-center'>
             <Image src="/icons/csi_logo.svg" width={50} height={50} alt="csiLogo" className='px-3' />
@@ -94,7 +117,7 @@ export default function Page() {
           </div>
         </div>
         <div className='w-[94%] mt-8 m-auto flex justify-center items-center'>
-          <Image src="/icons/bg_logo.svg" alt="bgLogo" width={10} height={10} className='absolute z-0 top-[50%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[22%]' />
+          <Image src="/icons/bg_logo.svg" alt="bgLogo" width={10} height={10} className='absolute z-0 top-[50%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[22%]' priority/>
           <div className='w-[98%] h-[84vh] flex flex-col items-center px-14 bg-[#FFFFFF] backdrop-filter backdrop-blur-[6px] rounded-md bg-opacity-30 z-10'>
             <div className='font-bold mb-4 text-4xl mt-5'>FEEDBACK</div>
             <div className='w-[60rem] pb-5 bg-white rounded-3xl border p-2 border-black bg-opacity-50 flex flex-col gap-1rem justify-center items-center'>

@@ -11,7 +11,6 @@ interface QuesCardProps {
 }
 
 export default function QuesNoCard(props: QuesCardProps) {
-
     const dispatch = useDispatch()
     const activeQuestionNumber = useSelector((state: RootState) => state.question.activeQuestionNumber);
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
@@ -37,7 +36,7 @@ export default function QuesNoCard(props: QuesCardProps) {
             }
             else if (allQuestions[props.id].state == "MR") {
                 pts = {
-                    backgroundColor: '#EAB308',
+                    backgroundColor: '#9333ea',
                     color: "white"
                 }
             }

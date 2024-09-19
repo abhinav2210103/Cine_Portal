@@ -3,8 +3,6 @@
 import BarChartQuestions from '@/components/BarChartQuestions';
 import Loader from '@/components/Loader/Loader';
 import Timer from '@/components/Timer';
-import { questionFetcher } from '@/constants/questionFetcher';
-import { responseFetcher } from '@/constants/responseFetcher';
 import { setQuestionsState } from '@/store/questionStateSlice';
 import { RootState } from '@/store/store';
 import Image from 'next/image';
@@ -12,7 +10,7 @@ import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
-
+import { questionFetcher } from '@/constants/questionFetcher';
 interface Option {
     desc: string,
     id: number,
@@ -30,6 +28,8 @@ interface QuestionType {
 }
 
 export default function Confirmation() {
+    if(typeof window === 'undefined') return; 
+    const userId = localStorage.getItem('userId');
     const allQuestions = useSelector((state: RootState) => state.questionState.allQuestions);
     const dispatch = useDispatch();
     const [loading, setLoading] = useState<boolean>(true);
@@ -42,37 +42,73 @@ export default function Confirmation() {
     const colors = ["#6B7280", "#ECB701", "#00C289", "#FF122E"];
 
     useEffect(() => {
+        const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+          event.preventDefault();
+        };      
+        window.addEventListener('beforeunload', handleBeforeUnload);
+        return () => {
+          window.removeEventListener('beforeunload', handleBeforeUnload);
+        };
+    }, []);
+
+    useEffect(() => {
         if (typeof window !== 'undefined') {
             const storedTime = localStorage.getItem('TREM');
             if (storedTime) {
                 setRemainTime(parseInt(storedTime, 10));
             }
         }
-
         async function getQuestion() {
             if (typeof window === 'undefined') return;
-            
-            const userId = localStorage.getItem('userId');
-            if (!userId) return;
+            if (!userId) {
+                router.push('/login');
+                return;
+            }
+            const trem : string  = localStorage.getItem('TREM') as string ;  
+            if(parseInt(trem) <= 0 ) {
+                router.push('/feedback');   
+                return; 
+            }
+            const responseData = await questionFetcher(userId); 
+            if(typeof responseData === 'string') {
+                router.push('/login');
+                return;
+            }
+            const { language, questions, responses } = responseData;
+            if (!language) {
+                localStorage.removeItem("userId");
+                localStorage.removeItem("language");
+                localStorage.removeItem("TREM");
+                router.push("/login");
+                return;
+            }
+            setMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language]);
+            localStorage.setItem("language", language);
 
-            let responses = await responseFetcher(userId);
             let data: QuestionType[] = [];
-            let language;
-
-            if (typeof window !== 'undefined') {
-                language = localStorage.getItem('language');
-                setMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language || ""]);
-            }
-
-            if (language) {
-                for (let i = 0; i < ['HTML', 'SQL', 'CSS', 'Aptitude', language].length; i++) {
-                    let temp = await questionFetcher(['HTML', 'SQL', 'CSS', 'Aptitude', language || ""], ['HTML', 'SQL', 'CSS', 'Aptitude', language || ""][i], userId, responses);
-                    data = [...data, ...temp];
+            const questionsBySubject = questions.reduce((acc: any, question: any) => {
+                if (!acc[question.subject]) {
+                    acc[question.subject] = [];
                 }
-                dispatch(setQuestionsState(data));
-            }
-        }
+                acc[question.subject].push(question);
+                return acc;
+            }, {});
+            const subjectsOrder = ['HTML', 'SQL', 'CSS', 'Aptitude', language];
+            const responseIds = ["NA", "MR", "A"];
+            const isResponsesEmpty = !Array.isArray(responses) || responses.length === 0;
+            for (const subject of subjectsOrder) {
+                const subjectQuestions = questionsBySubject[subject] || [];
+                const randomizedQuestions = subjectQuestions.map((q: any, index: number) => ({
+                    ...q,
+                    quesId: 100 * (subjectsOrder.indexOf(subject) + 1) + index + 1,
+                    state: isResponsesEmpty ? "UA" : responseIds[responses.find((r: any) => r.quesId === q._id)?.status] || "UA",
+                    recordedAns: isResponsesEmpty ? 0 : responses.find((r: any) => r.quesId === q._id)?.ansId || 0,
+                }));
         
+                data.push(...randomizedQuestions);
+            }
+            dispatch(setQuestionsState(data));
+        }        
         getQuestion();
     }, [dispatch]);
 
@@ -96,6 +132,19 @@ export default function Confirmation() {
 
         setSep(obj);
         setArr(temp);
+    }
+    const handleSubmit = async  () => {
+        try{
+            if (typeof window === 'undefined')
+                return;
+            const userId = localStorage.getItem("userId");
+            if (!userId)
+                router.push("/login");
+            localStorage.setItem("TREM", "0");
+            router.push("/feedback") ;
+        } catch (err) {
+
+        }
     }
 
     useEffect(() => {
@@ -142,14 +191,14 @@ export default function Confirmation() {
                                 <h1 className='text-2xl w-[80%] text-center font-bold'>Are you sure you want to submit your exam?</h1>
                                 <div className='flex justify-evenly w-full mt-6'>
                                     <button onClick={() => router.push("/start")} className='bg-[#B795E2] text-white font-bold py-2 px-10 rounded-xl'>Back to Test</button>
-                                    <button onClick={() => router.push("/feedback")} className='bg-[#546CFF] text-white font-bold py-2 px-10 rounded-xl'>Submit Test</button>
+                                    <button onClick={handleSubmit} className='bg-[#546CFF] text-white font-bold py-2 px-10 rounded-xl'>Submit Test</button>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <Image src="./icons/bg_logo.svg" alt="bgLogo" priority width={10} height={10} className='absolute z-0 top-[57%] left-[45%] -translate-x-1/2 -translate-y-1/2 w-[25%]' />
                 </div>
-            ) : <Loader />}
+            ) : <Loader containerStyles='flex justify-center items-center h-screen w-full'/>}
         </div>
     );
 }

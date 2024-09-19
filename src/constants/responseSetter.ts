@@ -11,7 +11,7 @@ async function responseSetter(
         quesId: quesId,
         status: status,
         ansId: ansId,
-    };
+    };   
     const res = await fetch(process.env.BACKEND_URL + "/student/response", {
         method: "POST",
         headers: {
@@ -22,7 +22,6 @@ async function responseSetter(
         }),
         credentials: "include",
     });
-    const data = await res.json();
 }
 
 export { responseSetter };

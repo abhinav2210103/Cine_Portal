@@ -9,6 +9,6 @@ export default function Home() {
     router.replace("/login")
   }, [])
   return (
-    <Loader />
+    <Loader containerStyles="flex justify-center items-center h-screen w-full"/>
   );
 }

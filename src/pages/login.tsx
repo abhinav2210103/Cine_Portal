@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import "../app/globals.css";
 import { FaEye, FaEyeSlash, FaUser, FaKey } from "react-icons/fa";
-import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { useFormik } from "formik";
 import validationSchema from "@/app/constants/validationSchema";
@@ -13,6 +12,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
 const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
+
 export default function Login(): React.ReactElement {
   return (
     <GoogleReCaptchaProvider
@@ -27,19 +27,38 @@ export default function Login(): React.ReactElement {
 
 const LoginComponent = () => {
   const [passwordVisible, setPasswordVisible] = useState<boolean>(false);
-  const { executeRecaptcha } = useGoogleReCaptcha();
   const [disabled, setDisabled] = useState<boolean>(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState<boolean>(false);
   const router = useRouter();
 
+
   useEffect(() => {
-    if (typeof window == undefined)
-      return
-    const userId = localStorage.getItem("userId")
-    const trem = localStorage.getItem("TREM");
-    if (userId != undefined) {
-      router.replace("/start")
+    if (typeof window !== "undefined") {
+      const checkDeviceView = () => {
+        if (window.innerWidth < 768 || window.innerHeight > window.innerWidth) {
+          router.replace("/error");
+        }
+      };
+
+      checkDeviceView(); 
+      window.addEventListener("resize", checkDeviceView);
+      return () => {
+        window.removeEventListener("resize", checkDeviceView);
+      };
     }
+  }, [router]);
+
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const userId = localStorage.getItem("userId");
+    const language = localStorage.getItem("language");
+    if (userId && !language) {
+      router.replace("/instructions");
+    } else if (userId && language) {
+      router.replace("/start");
+    }
+
     const Backgroundimage = new Image();
     Backgroundimage.src = "./cine-bg.png";
     Backgroundimage.onload = () => {
@@ -64,54 +83,38 @@ const LoginComponent = () => {
     onSubmit: async (values) => {
       setDisabled(true);
       try {
-        if (!executeRecaptcha) {
-          console.error("ReCAPTCHA not available");
-          return;
-        }
-        const token = await executeRecaptcha("Login");
-        const response = await fetch(
-          `${baseurl}/student/login`,
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ ...values, token }),
-            credentials: "include",
-          }
-        );
-        if (!response.ok) {
-          console.log("API call error response:", response);
-          if (response.status === 400) {
-            toast.error("Invalid credentials. Please try again.");
-          } else {
-            toast.error("An unexpected error occurred. Please try again later.");
-          }
-          throw new Error(`HTTP error! Status: ${response.status}`);
-        }
-        const data = await response.json();
-        if (typeof window != undefined)
-          localStorage.setItem('userId', data.userId);
-        const timeResponse = await fetch(`${baseurl}/student/timeRemaining?userId=${data.userId}`, {
-          method: "GET",
+        const loginResponse = await fetch("/api/login", {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          credentials: "include",
-        })
-        const timeData = await timeResponse.json()
-        console.log(timeData.remainingTime)
-        if (typeof window != undefined)
-          localStorage.setItem("TREM", timeData.remainingTime);
+          body: JSON.stringify({ ...values }),
+        });
+        if(loginResponse.status === 500) {
+          toast.error("Error logging in. Please try again.");
+          return;
+        }        
+        const loginData = await loginResponse.json();
+        if(loginData.message === "Invalid credentials") {
+          toast.error("Invalid credentials. Please try again.");
+          return;
+        }
+        if(loginData.message === "Test already submitted") {
+          toast.error("Test already submitted. Please contact the invigilator.");
+          return;
+        }
+        if (typeof window !== "undefined") {
+          localStorage.setItem('userId', loginData.userId);
+          localStorage.setItem('TREM', loginData.remainingTime);
+        }
         resetForm();
-        if (timeData.remainingTime == "10800000")
-          router.push("/instructions");
-        else
-          router.push("/start")
-      } catch (error) {
-        console.error("Login failed:", error);
-        toast.error("Login failed");
-      } finally {
+        if (loginData.language === "Invalid preference number") {
+            router.push("/instructions");
+        } else {
+            router.push("/start");
+        }
+      } catch (error : any ) { } 
+      finally {
         setDisabled(false);
       }
     },
@@ -173,7 +176,7 @@ const LoginComponent = () => {
                     Password:
                   </label>
                   <div className="border-2 border-black py-3 px-2 rounded-lg flex gap-2 w-[20rem] justify-evenly">
-                    <div>
+                    <div className="ml-2">
                       <FaKey size={24} />
                     </div>
                     <input
@@ -184,7 +187,7 @@ const LoginComponent = () => {
                       onChange={handleChange}
                       onBlur={handleBlur}
                       value={values.password}
-                      className="bg-transparent border-none outline-none"
+                      className="bg-transparent border-none outline-none w-[14rem] focus:bg-transparent"
                     />
                     <div className="cursor-pointer" onClick={togglePassword}>
                       {passwordVisible ? (

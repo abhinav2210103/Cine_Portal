@@ -2,6 +2,8 @@
 import React, { ChangeEvent, useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import ClipLoader from 'react-spinners/ClipLoader';
+import setPreferenceService from '@/constants/setPreference';
+import { toast } from 'react-toastify';
 
 interface StartButtonProps {
     selectedLanguage: string;
@@ -15,41 +17,30 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
     const router = useRouter();
 
     useEffect(() => {
-        if (typeof window != undefined) {
+        if (typeof window !== "undefined") {
             const storedUserId = localStorage.getItem('userId');
             if (storedUserId) {
                 setUserId(storedUserId);
             }
         }
     }, []);
-
     const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
         setStart(event.target.value);
     };
-
     const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
         setIsChecked(event.target.checked);
     };
-
     const handleStart = async () => {
         if (selectedLanguage) {
             setLoading(true);
             try {
-                const response = await fetch('https://cine-student.onrender.com/student/preferences', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ userId: userId, preference: parseInt(selectedLanguage) })
-                });
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
+                const response = await setPreferenceService(userId, selectedLanguage);
+                if (response === "Error fetching the response") {
+                    throw new Error("Error fetching the response");
                 }
-                const data = await response.json();
-                console.log('Success:', data);
-                router.push('/start');
+                router.push('/start');                 
             } catch (error) {
-                console.error('Error:', error);
+                toast.error("Error starting the test");
             } finally {
                 setLoading(false);
             }
@@ -73,13 +64,13 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
                     onChange={handleChange}
                     placeholder="START"
                 />
-                <button
-                    disabled={!(start === "START" && isChecked && selectedLanguage) || loading}
-                    onClick={handleStart}
-                    className={`${!(start === "START" && isChecked && selectedLanguage) || loading ? 'bg-gray-300 text-gray-600' : 'bg-[#546CFF] text-white'} w-[22%] rounded-xl p-2 pl-5 pr-5 ml-4 text-lg`}
-                >
-                    {loading ? <ClipLoader color="blue" size={24} /> : 'Start'}
-                </button>
+            <button
+                disabled={!(start === "START" && isChecked && selectedLanguage !== "") || loading}
+                onClick={handleStart}
+                className={`${!(start === "START" && isChecked && selectedLanguage !== "") || loading ? 'bg-gray-300 text-gray-600' : 'bg-[#546CFF] text-white'} w-[22%] rounded-xl p-2 pl-5 pr-5 ml-4 text-lg`}
+            >
+                {loading ? <ClipLoader color="blue" size={24} /> : 'Start'}
+            </button>
             </div>
         </>
     );

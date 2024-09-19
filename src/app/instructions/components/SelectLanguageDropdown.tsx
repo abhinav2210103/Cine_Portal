@@ -8,20 +8,21 @@ interface SelectLanguageDropdownProps {
 
 export default function SelectLanguageDropdown({ selectedLanguage, setSelectedLanguage }: SelectLanguageDropdownProps) {
     const [open, setOpen] = useState<boolean>(false);
-    if (typeof window == undefined) {
+    if (typeof window === "undefined") {
         return;
     }
     const languages = [
-        { value: 0, label: "" },
-        { value: 3, label: "C" },
-        { value: 4, label: "C++" },
-        { value: 6, label: "Java" },
-        { value: 5, label: "Python" },
+        { value: "", label: "" }, 
+        { value: "3", label: "C" },
+        { value: "4", label: "C++" },
+        { value: "6", label: "Java" },
+        { value: "5", label: "Python" },
     ];
-
+    
     const handleChange = (event: ChangeEvent<HTMLSelectElement>) => {
         setSelectedLanguage(event.target.value);
     };
+    
 
     return (
         <>
