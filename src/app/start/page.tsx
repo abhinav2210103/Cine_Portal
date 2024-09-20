@@ -144,13 +144,20 @@ export default function Page() {
             router.push('/login');
             return;
         }
-        const { language, questions, responses } = responseData;
+        let languageStart : string = ""  ; 
+        const { language, questions, responses } = responseData;        
         if (!language) {
-            toast.error("Error occured! Refresh the page")
-            return;
+            const languageLocale = localStorage.getItem("language"); 
+            if(!languageLocale) {
+                toast.error("Error occured! Refresh the page")
+                return;
+            }
+            languageStart = languageLocale;
+        }else {
+            languageStart = language;
         }
-        setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language]);
-        localStorage.setItem("language", language);
+        setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', languageStart]);
+        localStorage.setItem("language", languageStart);
 
         let data: QuestionType[] = [];
         const questionsBySubject = questions.reduce((acc: any, question: any) => {
@@ -160,7 +167,7 @@ export default function Page() {
             acc[question.subject].push(question);
             return acc;
         }, {});
-        const subjectsOrder = ['HTML', 'SQL', 'CSS', 'Aptitude', language];
+        const subjectsOrder = ['HTML', 'SQL', 'CSS', 'Aptitude', languageStart];
         const responseIds = ["NA", "MR", "A"];
         const isResponsesEmpty = !Array.isArray(responses) || responses.length === 0;
         for (const subject of subjectsOrder) {
