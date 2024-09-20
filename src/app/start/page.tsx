@@ -146,10 +146,7 @@ export default function Page() {
         }
         const { language, questions, responses } = responseData;
         if (!language) {
-            localStorage.removeItem("userId");
-            localStorage.removeItem("language");
-            localStorage.removeItem("TREM");
-            router.push("/login");
+            toast.error("Error occured! Refresh the page")
             return;
         }
         setNavMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language]);
