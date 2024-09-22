@@ -261,10 +261,10 @@ export default function Page() {
     }, []);
     useEffect(()=> {
         if(typeof window === "undefined") return ;  
-        if(tabSwitchCount >= 10 ) {
+        if(tabSwitchCount >= 2 ) {
             tabSwitchHandler(); 
             return; 
-        } else if ( tabSwitchCount >= 1) {
+        } else if ( tabSwitchCount >= 1 && tabSwitchCount < 2) {
             toast.error("Tab switching detected.");
         }        
     }, [tabSwitchCount])
