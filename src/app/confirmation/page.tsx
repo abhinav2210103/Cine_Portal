@@ -11,6 +11,7 @@ import React, { useEffect, useState } from 'react';
 import { Toaster } from 'react-hot-toast';
 import { useDispatch, useSelector } from 'react-redux';
 import { questionFetcher } from '@/constants/questionFetcher';
+import { toast } from 'react-toastify';
 interface Option {
     desc: string,
     id: number,
@@ -71,15 +72,12 @@ export default function Confirmation() {
             }
             const responseData = await questionFetcher(userId); 
             if(typeof responseData === 'string') {
-                router.push('/login');
+                toast.error("Error Occured! Refresh the page"); 
                 return;
             }
             const { language, questions, responses } = responseData;
             if (!language) {
-                localStorage.removeItem("userId");
-                localStorage.removeItem("language");
-                localStorage.removeItem("TREM");
-                router.push("/login");
+                toast.error("Error Occured! Refresh the page"); 
                 return;
             }
             setMenu(['HTML', 'SQL', 'CSS', 'Aptitude', language]);
