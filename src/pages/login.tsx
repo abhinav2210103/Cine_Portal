@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from "react";
 import "../app/globals.css";
 import { FaEye, FaEyeSlash, FaUser, FaKey } from "react-icons/fa";
-import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
 import { useFormik } from "formik";
 import validationSchema from "@/app/constants/validationSchema";
 import ClipLoader from "react-spinners/ClipLoader";
@@ -10,18 +9,12 @@ import { useRouter } from "next/router";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
-const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY || "";
-const baseurl = process.env.NEXT_PUBLIC_BACKEND_URL || "";
-
 export default function Login(): React.ReactElement {
   return (
-    <GoogleReCaptchaProvider
-      reCaptchaKey={recaptchaKey ?? "NOT DEFINED"}
-      scriptProps={{ async: true }}
-    >
+    <>
       <LoginComponent />
       <ToastContainer />
-    </GoogleReCaptchaProvider>
+    </>
   );
 }
 
