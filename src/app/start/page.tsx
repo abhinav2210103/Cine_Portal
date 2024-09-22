@@ -145,9 +145,9 @@ export default function Page() {
             return;
         }
         let languageStart : string = ""  ; 
-        const { language, questions, responses } = responseData;        
+        const { language, questions, responses } = responseData;  
         if (!language) {
-            const languageLocale = localStorage.getItem("language"); 
+            const languageLocale = localStorage.getItem("language");             
             if(!languageLocale) {
                 toast.error("Error occured! Refresh the page")
                 return;
@@ -261,7 +261,7 @@ export default function Page() {
     }, []);
     useEffect(()=> {
         if(typeof window === "undefined") return ;  
-        if(tabSwitchCount >= 1 ) {
+        if(tabSwitchCount >= 10 ) {
             tabSwitchHandler(); 
             return; 
         } else if ( tabSwitchCount >= 1) {

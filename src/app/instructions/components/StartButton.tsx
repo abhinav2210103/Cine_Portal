@@ -30,7 +30,7 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
     const handleCheckboxChange = (event: ChangeEvent<HTMLInputElement>) => {
         setIsChecked(event.target.checked);
     };
-    function langaugeValue(selectedLanguage : number ) : string {
+    function languageValue(selectedLanguage : number ) : string {
         switch(selectedLanguage) {
             case 3: return "C";
             case 4: return "Cpp";
@@ -47,8 +47,8 @@ export default function StartButton({ selectedLanguage }: StartButtonProps) {
                 if (response === "Error fetching the response") {
                     throw new Error("Error fetching the response");
                 }
-                const langauge = langaugeValue(parseInt(selectedLanguage)); 
-                localStorage.setItem("langauge", langauge); 
+                const language = languageValue(parseInt(selectedLanguage)); 
+                localStorage.setItem("language", language); 
                 router.push('/start');                 
             } catch (error) {
                 toast.error("Error occurred! Refresh the page and try again.");
