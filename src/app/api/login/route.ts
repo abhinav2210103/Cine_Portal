@@ -3,13 +3,13 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req : NextRequest) {
   try {
     const data = await req.json(); 
-    const { studentNumber, password } = data;
+    const { studentNumber, password, token  } = data;
     const response = await fetch(`${process.env.BACKEND_URL}/student/login`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ studentNumber, password }),
+      body: JSON.stringify({ studentNumber, password, token }),
       credentials: "include",
     });
     const responseData = await response.json();
@@ -18,6 +18,6 @@ export async function POST(req : NextRequest) {
     }
     return NextResponse.json(responseData, { status: 200 });
   } catch (err) {
-    return NextResponse.json({ message: "Error", err }, { status: 500 });
+    return NextResponse.json({ message: "Error occured! Please try again", err }, { status: 500 });
   }
 }

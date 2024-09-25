@@ -8,13 +8,19 @@ import ClipLoader from "react-spinners/ClipLoader";
 import { useRouter } from "next/router";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3";
+import { useGoogleReCaptcha } from "react-google-recaptcha-v3";
 
+const recaptchaKey = process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY;
 export default function Login(): React.ReactElement {
   return (
-    <>
+    <GoogleReCaptchaProvider
+      reCaptchaKey={recaptchaKey ?? "NOT DEFINED"}
+      scriptProps={{ async: true }}
+    >
       <LoginComponent />
       <ToastContainer />
-    </>
+    </GoogleReCaptchaProvider>
   );
 }
 
@@ -23,7 +29,7 @@ const LoginComponent = () => {
   const [disabled, setDisabled] = useState<boolean>(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState<boolean>(false);
   const router = useRouter();
-
+  const { executeRecaptcha } = useGoogleReCaptcha();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -32,7 +38,6 @@ const LoginComponent = () => {
           router.replace("/error");
         }
       };
-
       checkDeviceView(); 
       window.addEventListener("resize", checkDeviceView);
       return () => {
@@ -40,8 +45,6 @@ const LoginComponent = () => {
       };
     }
   }, [router]);
-
-
   useEffect(() => {
     if (typeof window === "undefined") return;
     const userId = localStorage.getItem("userId");
@@ -76,18 +79,27 @@ const LoginComponent = () => {
     onSubmit: async (values) => {
       setDisabled(true);
       try {
+        if(!executeRecaptcha) {
+          toast.error("Recaptcha error. Please refresh the page.");
+          return;
+        }
+        const token = await executeRecaptcha("login");
         const loginResponse = await fetch("/api/login", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ ...values }),
+          body: JSON.stringify({ ...values, token  }),
         });
+        if(loginResponse.status === 403) {
+          toast.error("ReCaptcha verification failed. Please refresh the page.");
+          return;
+        }
         if(loginResponse.status === 500) {
           toast.error("Error logging in. Please try again.");
           return;
-        }        
-        const loginData = await loginResponse.json();
+        } 
+        const loginData = await loginResponse.json();      
         if(loginData.message === "Invalid credentials") {
           toast.error("Invalid credentials. Please try again.");
           return;
