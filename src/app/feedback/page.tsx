@@ -80,7 +80,7 @@ export default function Page() {
             ans: slider1,
           },
           {
-            question: 'How was the level of questions in the exam?',
+            question: 'How was your experience with the exam portal?',
             ans: slider2,
           },
           {
@@ -130,7 +130,7 @@ export default function Page() {
             </div>
             <div className='w-[60rem] pb-5 bg-white rounded-3xl border p-2 mt-5 border-black bg-opacity-50 flex flex-col gap-1rem justify-center items-center'>
               <div className='text-2xl font-medium text-black text-center'>
-                How was the level of questions in the exam???
+                How was your experience with the exam portal?
               </div>
               <div>
                 <FeedbackSlider onSliderChange={handleSlider2Change} />
