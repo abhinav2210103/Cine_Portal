@@ -2,7 +2,7 @@
 
 ## Deployment
 
-Link : https://cineportal2024.netlify.app/
+Link : https://cine24exam.netlify.app
 
 ## Routes
 
