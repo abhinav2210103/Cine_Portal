@@ -4,6 +4,9 @@ export async function POST(req : NextRequest) {
   try {
     const data = await req.json(); 
     const { studentNumber, password, token  } = data;
+    if (!studentNumber || !password) {
+      return NextResponse.json({ message: "Missing required fields" }, { status: 400 });
+    }
     const response = await fetch(`${process.env.BACKEND_URL}/student/login`, {
       method: "POST",
       headers: {
