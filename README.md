@@ -2,7 +2,7 @@
 
 ## Deployment
 
-Link : https://cine24exam.netlify.app/
+Link : https://cine.rishirajsingh.in/
 
 ## Routes
 
