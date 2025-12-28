@@ -2,8 +2,7 @@
 
 ## Deployment
 
-Link : https://cine.rishirajsingh.in/
-
+Link : https://cine.abhinavmishra.tech
 ## Routes
 
 Instructions Page : ``/instructions``
